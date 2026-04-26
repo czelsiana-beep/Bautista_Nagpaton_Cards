@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Colors of Deception</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+
+<!-- Background Texture -->
+<div class="bg-texture"></div>
+
+
+<!-- ===================== MAIN MENU ===================== -->
+<div class="screen active" id="screen-menu">
+  <div class="menu-crest">⚜️</div>
+  <div class="game-title">Colors of Deception</div>
+  <div class="game-subtitle">A Game of Cards &amp; Hidden Shadows</div>
+  <div class="divider"></div>
+
+
+  <!-- Player Name Input -->
+  <div class="name-input-wrap">
+    <label>Enter Your Name, Noble</label>
+    <input type="text" id="player-name-input" placeholder="Your Name..." maxlength="20" />
+  </div>
+
+
+  <!-- Opponent Count Selector -->
+  <div class="opponent-select-wrap">
+    <label>⚔️ Choose Your Opponents</label>
+    <div class="opponent-cards">
+
+
+      <div class="opp-select-card selected" data-opponents="1">
+        <span class="osc-count">1</span>
+        <span class="osc-label">Opponent</span>
+        <span class="osc-icons">🤖</span>
+      </div>
+
+
+      <div class="opp-select-card" data-opponents="2">
+        <span class="osc-count">2</span>
+        <span class="osc-label">Opponents</span>
+        <span class="osc-icons">🤖🤖</span>
+      </div>
+
+
+      <div class="opp-select-card" data-opponents="3">
+        <span class="osc-count">3</span>
+        <span class="osc-label">Opponents</span>
+        <span class="osc-icons">🤖🤖🤖</span>
+      </div>
+
+
+      <div class="opp-select-card" data-opponents="4">
+        <span class="osc-count">4</span>
+        <span class="osc-label">Opponents</span>
+        <span class="osc-icons">🤖🤖🤖🤖</span>
+      </div>
+
+
+    </div>
+    <div 
+style="font-size:11px;color:rgba(244,232,193,0.4);margin-top:10px;text-align:center;font-family:'Cinzel',serif;letter-spacing:1px;">
+      All opponents are AI — they will think and play on their own
+    </div>
+  </div>
+
+
+  <button class="btn-primary" onclick="startGame()">⚔️ Begin the Game</button>
+  <button class="btn-secondary" onclick="showCodex()">📜 Read the Codex</button>
+</div>
