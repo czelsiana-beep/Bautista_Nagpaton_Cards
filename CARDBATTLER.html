@@ -74,3 +74,78 @@ style="font-size:11px;color:rgba(244,232,193,0.4);margin-top:10px;text-align:cen
   <button class="btn-primary" onclick="startGame()">⚔️ Begin the Game</button>
   <button class="btn-secondary" onclick="showCodex()">📜 Read the Codex</button>
 </div>
+
+<!-- ===================== CODEX ===================== -->
+<div class="screen" id="screen-codex" style="align-items:center;padding:20px 12px;justify-content:flex-start;padding-top:24px;">
+  <div class="codex-inner">
+    <div class="codex-title">📜 The Codex of Deception</div>
+
+
+    <div class="codex-section">
+      <h3>🎯 Goal</h3>
+      <p>This is a card game like UNO — but with <strong>hidden roles</strong>. Good players try to survive and empty their hand. Evil players try to deceive and destroy. Use cards + special abilities to outsmart the enemy faction.</p>
+    </div>
+
+
+    <div class="codex-section">
+      <h3>🃏 How Cards Work</h3>
+      <ul>
+        <li>Cards have a <strong>number (1–10)</strong> and a <strong>color (Red, Blue, Green, Yellow)</strong>.</li>
+        <li>On your turn: play a card that <strong>matches the color OR number</strong> of the top discard card.</li>
+        <li>If you can't play, <strong>draw one card</strong> from the deck (1 draw per turn max).</li>
+        <li><strong>Curse Cards ☠️</strong> — Drawing one forces your next turn to be skipped.</li>
+        <li>First good player to <strong>empty their hand wins</strong> — or the first team to eliminate all enemies.</li>
+      </ul>
+    </div>
+
+
+    <div class="codex-section">
+      <h3>⚡ Special Abilities — One-Time Powers</h3>
+      <ul>
+        <li><strong>🔮 The Mage</strong> — Sees all evil players from the start. Cannot tell anyone directly.</li>
+        <li><strong>⚔️ Jose</strong> — Strike: Choose a player. If evil → eliminated. If good → Jose loses 2 cards.</li>
+        <li><strong>🛡️ Carl</strong> — Shield: Protect any player from the next ability used against them.</li>
+        <li><strong>👑 Louise</strong> — Three powers: Corrupt Draw (+2 to target), False Vision (see alignment), Silence Curse (skip ability).</li>
+        <li><strong>🕷️ Nica</strong> — Hunt: Guess who the Mage is. Correct = Evil wins instantly.</li>
+      </ul>
+    </div>
+
+
+    <div class="codex-section">
+      <h3>🏆 Win Conditions</h3>
+      <ul>
+        <li><span class="good">🟦 Good Team Wins:</span> Any good player empties their hand, OR all evil players are eliminated.</li>
+        <li><span class="evil">🟥 Evil Team Wins:</span> Nica correctly identifies the Mage, OR all good players are eliminated.</li>
+      </ul>
+    </div>
+
+
+    <div class="codex-section">
+      <h3>👥 The Roles</h3>
+      <div class="role-card-mini">
+        <div class="role-name good">🔮 The Mage — Loyal Servant of Rina</div>
+        <div class="role-desc">Sees all evil players from the very start. Must stay hidden. If Nica identifies them, the evil team wins instantly.</div>
+      </div>
+      <div class="role-card-mini">
+        <div class="role-name good">⚔️ Jose — Loyal Servant of Rina</div>
+        <div class="role-desc">Can eliminate one player. Kills evil = great. Kills good = Jose loses 2 cards as punishment.</div>
+      </div>
+      <div class="role-card-mini">
+        <div class="role-name good">🛡️ Carl — Loyal Servant of Rina</div>
+        <div class="role-desc">Shields any one player from the next ability used against them. Shield expires after one use.</div>
+      </div>
+      <div class="role-card-mini">
+        <div class="role-name evil">👑 Louise (The Malveraxis) — Shadow Court</div>
+        <div class="role-desc">Corrupt Draw, False Vision, Silence Curse. Three powerful abilities to disrupt good players.</div>
+      </div>
+      <div class="role-card-mini">
+        <div class="role-name evil">🕷️ Nica — Shadow Court</div>
+        <div class="role-desc">Hunts the Mage. If she guesses correctly — evil team wins immediately.</div>
+      </div>
+    </div>
+
+
+    <button class="btn-primary" onclick="showMenu()" style="width:100%;margin-top:4px;">← Back to Menu</button>
+  </div>
+</div>
+
