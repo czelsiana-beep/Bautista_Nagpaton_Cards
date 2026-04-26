@@ -149,3 +149,74 @@ style="font-size:11px;color:rgba(244,232,193,0.4);margin-top:10px;text-align:cen
   </div>
 </div>
 
+<!-- ===================== ROLE REVEAL ===================== -->
+<div class="screen" id="screen-role">
+  <div id="role-reveal-content"></div>
+  <button class="btn-primary" onclick="proceedAfterRole()" style="margin-top:16px;">I Understand My Role →</button>
+</div>
+
+
+
+
+<!-- ===================== GAME SCREEN ===================== -->
+<div class="screen" id="screen-game">
+
+
+  <!-- Header -->
+  <div class="game-header">
+    <div class="game-logo">⚜️ Colors of Deception</div>
+    <div class="turn-indicator">Turn: <span id="turn-name">—</span></div>
+    <button class="btn-secondary" onclick="showCodexInGame()" style="padding:5px 12px;font-size:11px;">📜 Rules</button>
+  </div>
+
+
+  <!-- Opponents Row -->
+  <div class="opponents-row" id="opponents-row"></div>
+
+
+  <!-- Central Play Area -->
+  <div class="play-area">
+    <div class="action-log" id="action-log">Waiting for the game to begin...</div>
+    <div class="center-row">
+
+
+      <!-- Draw Deck -->
+      <div class="draw-deck-wrap">
+        <div class="draw-deck" id="draw-deck" onclick="playerDrawCard()">
+          <div class="draw-deck-icon">🂠</div>
+          <div class="draw-deck-label">Draw</div>
+          <div class="draw-deck-count" id="deck-count">40</div>
+        </div>
+        <div class="draw-limit-notice">1 per turn</div>
+      </div>
+
+
+      <!-- Discard Pile -->
+      <div class="discard-pile-wrap">
+        <div class="discard-label">Current Card</div>
+        <div class="discard-pile" id="discard-pile">
+          <div class="card-number" id="top-card-num">—</div>
+          <div class="card-color-name" id="top-card-color">—</div>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+
+
+  <!-- Ability Panel -->
+  <div class="ability-panel" id="ability-panel"></div>
+
+
+  <!-- Human Player Zone -->
+  <div class="player-zone" id="player-zone">
+    <div class="player-info-row">
+      <div class="player-name-tag" id="player-name-tag">Your Name</div>
+      <div class="player-hand-label">Your Hand</div>
+    </div>
+    <div class="hand-cards" id="hand-cards"></div>
+  </div>
+
+
+</div>
