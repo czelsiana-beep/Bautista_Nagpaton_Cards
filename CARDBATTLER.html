@@ -217,6 +217,29 @@ style="font-size:11px;color:rgba(244,232,193,0.4);margin-top:10px;text-align:cen
     </div>
     <div class="hand-cards" id="hand-cards"></div>
   </div>
-
-
 </div>
+
+<!-- ===================== GAME OVER ===================== -->
+<div class="screen" id="screen-gameover">
+  <div class="gameover-crest" id="go-crest">⚜️</div>
+  <div class="gameover-title" id="go-title">Game Over</div>
+  <div class="gameover-sub" id="go-sub">The battle has ended.</div>
+  <div id="go-reveals" class="reveal-list"></div>
+  <button class="btn-primary" onclick="showMenu()" style="margin-top:12px;">↩ Return to Menu</button>
+</div>
+
+
+<!-- ===================== TARGET OVERLAY ===================== -->
+<div class="target-overlay" id="target-overlay">
+  <div class="target-title" id="target-title">Choose a Target</div>
+  <div class="target-subtitle" id="target-subtitle"></div>
+  <div class="target-list" id="target-list"></div>
+  <button class="btn-cancel" onclick="cancelTarget()">✕ Cancel</button>
+</div>
+
+
+<script src="game.js"></script>
+</body>
+</html>
+
+
