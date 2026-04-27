@@ -1,0 +1,40 @@
+/* ============================================================
+   Colors of Deception — style.css
+   Dark Fantasy Card Battler
+   ============================================================ */
+
+
+:root {
+  --gold: #c9a84c;
+  --gold-light: #f0d070;
+  --gold-dark: #7a5c1e;
+  --parchment: #f4e8c1;
+  --parchment-dark: #d4c090;
+  --blood: #8b1a1a;
+  --blood-light: #c0392b;
+  --deep-navy: #0a0e1a;
+  --navy: #111827;
+  --navy-mid: #1e2a3a;
+  --stone: #2a2a3a;
+  --stone-light: #3a3a4a;
+  --good-blue: #1a4a8a;
+  --good-blue-light: #2e6db4;
+  --evil-purple: #4a1a6a;
+  --evil-purple-light: #7b2d8b;
+  --red-card: #c0392b;
+  --blue-card: #1a5fa8;
+  --green-card: #1a7a3a;
+  --yellow-card: #b8860b;
+}
+
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+
+body {
+  font-family: 'IM Fell English', serif;
+  background: var(--deep-navy);
+  color: var(--parchment);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
