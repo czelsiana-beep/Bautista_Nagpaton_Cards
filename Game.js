@@ -90,3 +90,42 @@ class Deck {
     UIController.showToast('📜 The deck has been reshuffled from the discard pile!');
   }
 }
+
+// ============================================================
+// PLAYER CLASS
+// ============================================================
+class Player {
+  constructor(id, name, isHuman, roleData) {
+    this.id = id;
+    this.name = name;
+    this.isHuman = isHuman;
+    this.role = roleData;
+    this.hand = [];
+    this.abilityUsed = false;
+    this.shielded = false;
+    this.silenced = false;
+    this.silencedTurns = 0;
+    this.eliminated = false;
+    this.drawnThisTurn = false; // draw limit tracker
+  }
+
+
+  receiveCard(card) {
+    if (card) this.hand.push(card);
+  }
+
+
+  removeCard(index) {
+    return this.hand.splice(index, 1)[0];
+  }
+
+
+  get playableCards() {
+    return this.hand.filter(c => c.canPlayOn(GameManager.currentColor, GameManager.currentNumber));
+  }
+
+
+  get isAlive() {
+    return !this.eliminated;
+  }
+}
