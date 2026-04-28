@@ -603,4 +603,196 @@ const UIController = {
       addBtn('🤫', 'SILENCE CURSE', 'Skip target ability for 1 turn', player.abilityUsed, () => this.activateLouise('silence'), true);
     }
     if (role.id === 'nica') addBtn('🕵️', 'HUNT MAGE', 'Guess the Mage — Win if correct!', player.abilityUsed, () => this.activateNica(), true);
+  }
+
+  // --- Player Actions ---
+  onPlayerPlayCard(idx) {
+    if (GameManager.currentTurn !== 0 || GameManager.gameOver) return;
+    const player = GameManager.humanPlayer;
+    if (player.silenced) { this.showToast('🤫 You are silenced and cannot act this turn!'); return; }
+    const success = GameManager.playCard(0, idx);
+    if (success) {
+      this.renderGame();
+      if (!GameManager.gameOver) setTimeout(() => GameManager.nextTurn(), 500);
+    } else {
+      this.showToast('❌ That card cannot be played right now.');
+    }
   },
+
+
+  onPlayerDrawCard() {
+    if (GameManager.currentTurn !== 0 || GameManager.gameOver) return;
+    const player = GameManager.humanPlayer;
+    if (player.eliminated) return;
+    if (player.drawnThisTurn) { this.showToast('🚫 You already drew a card this turn. Play a card or End Turn.'); return; }
+
+
+    const drew = GameManager.drawCard(0);
+    if (!drew) { this.showToast('No cards left to draw!'); return; }
+
+
+    let msg = `You drew a ${drew.color} ${drew.displayValue} card.`;
+    if (drew.isCurse) msg = `☠️ CURSE drawn! Your next turn is skipped!`;
+    this.setLog(msg);
+    this.renderGame();
+    // After drawing, if no playable cards exist, auto end turn
+    setTimeout(() => {
+      if (!player.playableCards.length) {
+        this.setLog(msg + ' No playable cards — turn passes.');
+        setTimeout(() => GameManager.nextTurn(), 700);
+      }
+    }, 300);
+  },
+
+
+  // --- Ability Activations ---
+  activateJose() {
+    if (GameManager.currentTurn !== 0) return;
+    const player = GameManager.humanPlayer;
+    if (player.abilityUsed) { this.showToast('Ability already used!'); return; }
+    const targets = GameManager.players.filter(p => p.id !== 0 && p.isAlive);
+    this.openTargetOverlay('⚔️ STRIKE — Choose Your Target', 'If evil → eliminated. If good → you lose 2 cards.', targets, (target) => {
+      player.abilityUsed = true;
+      if (target.role.team === 'evil') {
+        target.eliminated = true;
+        this.setLogBig(`⚔️ ${player.name} strikes ${target.name}! They were EVIL — eliminated!`);
+        GameManager.checkFactionWin();
+      } else {
+        GameManager.drawCard(0, true);
+        GameManager.drawCard(0, true);
+        this.setLogBig(`⚔️ ${player.name} struck an innocent! ${target.name} was GOOD. Lose 2 cards as penance.`);
+      }
+      this.renderGame();
+    });
+  },
+
+
+  activateCarl() {
+    if (GameManager.currentTurn !== 0) return;
+    const player = GameManager.humanPlayer;
+    if (player.abilityUsed) { this.showToast('Ability already used!'); return; }
+    const targets = GameManager.players.filter(p => p.isAlive);
+    this.openTargetOverlay('🛡️ SHIELD — Choose Who to Protect', 'This player will be immune to the next ability.', targets, (target) => {
+      player.abilityUsed = true;
+      target.shielded = true;
+      this.setLogBig(`🛡️ ${target.name} is now shielded!`);
+      this.renderGame();
+    });
+  },
+
+
+  activateLouise(type) {
+    if (GameManager.currentTurn !== 0) return;
+    const player = GameManager.humanPlayer;
+    if (player.abilityUsed) { this.showToast('Ability already used this game!'); return; }
+    const targets = GameManager.players.filter(p => p.id !== 0 && p.isAlive);
+    const titles = { corrupt: '💀 CORRUPT DRAW', vision: '👁️ FALSE VISION', silence: '🤫 SILENCE CURSE' };
+    const subs = { corrupt: 'Force target to draw +2 cards.', vision: 'See if target is GOOD or EVIL.', silence: 'Target skips ability use for 1 turn.' };
+    this.openTargetOverlay(titles[type], subs[type], targets, (target) => {
+      player.abilityUsed = true;
+      if (type === 'corrupt') {
+        if (target.shielded) { target.shielded = false; this.setLogBig(`💀 Corrupt Draw BLOCKED by ${target.name}'s shield!`); }
+        else { GameManager.drawCard(target.id, true); GameManager.drawCard(target.id, true); this.setLogBig(`💀 Louise forces ${target.name} to draw +2 cards!`); }
+      }
+      if (type === 'vision') {
+        const align = target.role.team === 'good' ? 'GOOD ⚔️' : 'EVIL ☠️';
+        this.showToast(`👁️ Vision reveals: ${target.name} is ${align}`);
+        this.setLog(`Louise used False Vision on ${target.name}.`);
+      }
+      if (type === 'silence') {
+        if (target.shielded) { target.shielded = false; this.setLogBig(`🤫 Silence Curse BLOCKED by ${target.name}'s shield!`); }
+        else { target.silenced = true; target.silencedTurns = 1; this.setLogBig(`🤫 ${target.name} is silenced for 1 turn!`); }
+      }
+      this.renderGame();
+    });
+  },
+
+
+  activateNica() {
+    if (GameManager.currentTurn !== 0) return;
+    const player = GameManager.humanPlayer;
+    if (player.abilityUsed) { this.showToast('Ability already used!'); return; }
+    const targets = GameManager.players.filter(p => p.id !== 0 && p.isAlive);
+    this.openTargetOverlay('🕷️ HUNT — Guess the Mage', 'If your target is the Mage — EVIL WINS INSTANTLY!', targets, (target) => {
+      player.abilityUsed = true;
+      if (target.role.id === 'mage') {
+        this.setLogBig(`🕷️ Nica exposes ${target.name} as THE MAGE! EVIL WINS!`);
+        setTimeout(() => GameManager.endGame('evil', `Nica identified ${target.name} as the Mage! The Shadow Court wins!`), 800);
+      } else {
+        this.setLogBig(`🕷️ Nica guesses ${target.name} is the Mage... WRONG. Hunt fails.`);
+        this.renderGame();
+      }
+    });
+  },
+
+
+  // --- Target Overlay ---
+  openTargetOverlay(title, sub, targets, callback) {
+    this.targetCallback = callback;
+    document.getElementById('target-title').textContent = title;
+    document.getElementById('target-subtitle').textContent = sub;
+    const list = document.getElementById('target-list');
+    list.innerHTML = '';
+    for (const t of targets) {
+      const el = document.createElement('div');
+      el.className = 'target-card';
+      el.innerHTML = `<div class="tc-emoji">${t.role.emoji}</div><div class="tc-name">${t.name}</div>`;
+      el.addEventListener('click', () => { this.closeTarget(); callback(t); });
+      list.appendChild(el);
+    }
+    document.getElementById('target-overlay').classList.add('show');
+  },
+
+
+  closeTarget() {
+    document.getElementById('target-overlay').classList.remove('show');
+    this.targetCallback = null;
+  },
+
+
+  // --- Game Over ---
+  showGameOver(winTeam, message, players) {
+    const isGoodWin = winTeam === 'good';
+    document.getElementById('go-crest').textContent = isGoodWin ? '⚔️' : '☠️';
+    document.getElementById('go-title').textContent = isGoodWin ? '⚜️ Victory for the Realm!' : '☠️ The Shadow Court Prevails';
+    document.getElementById('go-title').style.color = isGoodWin ? 'var(--gold-light)' : '#f06060';
+    document.getElementById('go-sub').textContent = message;
+
+
+    const reveals = document.getElementById('go-reveals');
+    reveals.innerHTML = '';
+    for (const p of players) {
+      const badge = document.createElement('div');
+      badge.className = 'reveal-badge';
+      badge.innerHTML = `<div class="rb-emoji">${p.role.emoji}</div><div class="rb-name">${p.name}</div><div class="rb-role" style="color:${p.role.team === 'good' ? '#6ab0f5' : '#f06060'}">${p.role.name}</div>`;
+      reveals.appendChild(badge);
+    }
+    setTimeout(() => this.showScreen('screen-gameover'), 1600);
+  },
+
+
+  // --- Log ---
+  setLog(msg) {
+    const el = document.getElementById('action-log');
+    el.className = 'action-log';
+    el.textContent = msg;
+  },
+  setLogBig(msg) {
+    const el = document.getElementById('action-log');
+    el.className = 'action-log big-announce';
+    el.textContent = msg;
+  },
+
+
+  // --- Toast ---
+  showToast(msg) {
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    if (this.toastTimer) clearTimeout(this.toastTimer);
+    this.toastTimer = setTimeout(() => t.remove(), 2800);
+  }
+};
