@@ -351,3 +351,112 @@ const GameManager = {
     UIController.showGameOver(winTeam, message, this.players);
   }
 };
+
+// ============================================================
+// AI CONTROLLER
+// ============================================================
+const AIController = {
+  takeTurn(player) {
+    if (GameManager.gameOver || !player || player.eliminated || player.isHuman) return;
+
+
+    // Try ability with 25% chance
+    if (!player.abilityUsed && Math.random() < 0.25) {
+      const used = this.tryAbility(player);
+      if (used) {
+        UIController.renderGame();
+        setTimeout(() => this.continueTurn(player), 900);
+        return;
+      }
+    }
+    this.continueTurn(player);
+  },
+
+
+  continueTurn(player) {
+    if (GameManager.gameOver) return;
+    const playable = player.hand.filter(c => c.canPlayOn(GameManager.currentColor, GameManager.currentNumber));
+
+
+    if (playable.length > 0) {
+      // Prefer non-curse playable cards; play highest value for strategy
+      const card = playable.sort((a, b) => (b.number || 0) - (a.number || 0))[0];
+      const idx = player.hand.indexOf(card);
+      GameManager.playCard(player.id, idx);
+    } else {
+      const drew = GameManager.drawCard(player.id, true);
+      UIController.setLog(`${player.name} cannot play and draws a card.`);
+    }
+    UIController.renderGame();
+    setTimeout(() => GameManager.nextTurn(), 700);
+  },
+
+
+  tryAbility(player) {
+    const others = GameManager.players.filter(p => p.id !== player.id && p.isAlive);
+    if (others.length === 0) return false;
+    const role = player.role;
+
+
+    if (role.id === 'jose') {
+      const evilTarget = others.find(p => p.role.team === 'evil');
+      if (evilTarget) {
+        player.abilityUsed = true;
+        evilTarget.eliminated = true;
+        UIController.setLogBig(`⚔️ ${player.name} strikes! ${evilTarget.name} is eliminated!`);
+        GameManager.checkFactionWin();
+        return true;
+      }
+    }
+
+
+    if (role.id === 'carl') {
+      const goodTarget = others.find(p => p.role.team === 'good');
+      if (goodTarget) {
+        player.abilityUsed = true;
+        goodTarget.shielded = true;
+        UIController.setLogBig(`🛡️ ${player.name} shields ${goodTarget.name}!`);
+        return true;
+      }
+    }
+
+
+    if (role.id === 'louise') {
+      const goodTarget = others.find(p => p.role.team === 'good');
+      if (goodTarget) {
+        player.abilityUsed = true;
+        if (goodTarget.shielded) {
+          goodTarget.shielded = false;
+          UIController.setLogBig(`💀 Louise's Corrupt Draw was BLOCKED by ${goodTarget.name}'s shield!`);
+        } else {
+          GameManager.drawCard(goodTarget.id, true);
+          GameManager.drawCard(goodTarget.id, true);
+          UIController.setLogBig(`💀 Louise forces ${goodTarget.name} to draw +2 cards!`);
+        }
+        return true;
+      }
+    }
+
+
+    if (role.id === 'nica') {
+      if (Math.random() < 0.35) {
+        const magePlayer = others.find(p => p.role.id === 'mage');
+        if (magePlayer) {
+          player.abilityUsed = true;
+          UIController.setLogBig(`🕷️ Nica hunts the Mage and finds ${magePlayer.name}! EVIL WINS!`);
+          GameManager.endGame('evil', `Nica correctly identified ${magePlayer.name} as the Mage! The Shadow Court wins!`);
+          return true;
+        }
+      } else if (Math.random() < 0.25) {
+        player.abilityUsed = true;
+        const wrongTarget = others[Math.floor(Math.random() * others.length)];
+        UIController.setLogBig(`🕷️ Nica hunts... but ${wrongTarget.name} is not the Mage. Hunt fails.`);
+        return true;
+      }
+    }
+
+
+    return false;
+  }
+};
+
