@@ -168,3 +168,186 @@ const ROLES = [
 
 
 const AI_NAMES = ['Sir Aldric', 'Lady Maren', 'Thane Bors', 'Ser Voss', 'Dame Elara', 'Lord Fenwick'];
+
+// ============================================================
+// GAME MANAGER
+// ============================================================
+const GameManager = {
+  players: [],
+  deck: null,
+  discard: [],
+  currentTurn: 0,
+  currentColor: null,
+  currentNumber: null,
+  gameOver: false,
+  aiThinkingTimer: null,
+
+
+  init(humanName, opponentCount) {
+    this.players = [];
+    this.deck = new Deck();
+    this.discard = [];
+    this.currentTurn = 0;
+    this.currentColor = null;
+    this.currentNumber = null;
+    this.gameOver = false;
+
+
+    const totalPlayers = opponentCount + 1; // human + AI opponents
+    const rolePool = this._shuffleArray([...ROLES]).slice(0, totalPlayers);
+
+
+    // Player 0 = human
+    this.players.push(new Player(0, humanName || 'Noble Hero', true, rolePool[0]));
+    for (let i = 1; i < totalPlayers; i++) {
+      this.players.push(new Player(i, AI_NAMES[i - 1], false, rolePool[i]));
+    }
+
+
+    // Deal 5 cards each
+    for (const p of this.players) {
+      for (let k = 0; k < 5; k++) this._dealCard(p);
+    }
+
+
+    // Flip first non-curse card
+    let startCard;
+    do { startCard = this.deck.draw(); } while (startCard && startCard.isCurse);
+    if (startCard) {
+      this.discard.push(startCard);
+      this.currentColor = startCard.color;
+      this.currentNumber = startCard.number;
+    }
+  },
+
+
+  _dealCard(player) {
+    if (this.deck.count === 0) this.deck.reshuffleFrom(this.discard);
+    const card = this.deck.draw();
+    if (card) player.receiveCard(card);
+  },
+
+
+  _shuffleArray(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  },
+
+
+  get humanPlayer() {
+    return this.players[0];
+  },
+
+
+  get currentPlayer() {
+    return this.players[this.currentTurn];
+  },
+
+
+  playCard(playerIndex, cardIndex) {
+    const player = this.players[playerIndex];
+    const card = player.hand[cardIndex];
+    if (!card || !card.canPlayOn(this.currentColor, this.currentNumber)) return false;
+
+
+    player.removeCard(cardIndex);
+    this.discard.push(card);
+    this.currentColor = card.color;
+    this.currentNumber = card.number;
+
+
+    UIController.setLog(`${player.name} played a ${card.color.toUpperCase()} ${card.displayValue}.`);
+
+
+    if (player.hand.length === 0) {
+      const winTeam = player.role.team === 'evil' ? 'evil' : 'good';
+      this.endGame(winTeam, `${player.name} emptied their hand! ${winTeam === 'good' ? 'The realm is saved!' : 'Darkness prevails!'}`);
+      return true;
+    }
+
+
+    return true;
+  },
+
+
+  drawCard(playerIndex, forceAllow = false) {
+    const player = this.players[playerIndex];
+    if (!forceAllow && player.drawnThisTurn) return null;
+
+
+    if (this.deck.count === 0) this.deck.reshuffleFrom(this.discard);
+    const card = this.deck.draw();
+    if (!card) return null;
+
+
+    player.receiveCard(card);
+    player.drawnThisTurn = true;
+
+
+    if (card.isCurse) {
+      player.silenced = true;
+      player.silencedTurns = 1;
+      UIController.showToast(`☠️ ${player.name} drew a CURSE card — next turn skipped!`);
+    }
+    return card;
+  },
+
+
+  nextTurn() {
+    if (this.gameOver) return;
+    this.checkFactionWin();
+    if (this.gameOver) return;
+
+
+    let next = (this.currentTurn + 1) % this.players.length;
+    let attempts = 0;
+    while (this.players[next].eliminated && attempts < this.players.length) {
+      next = (next + 1) % this.players.length;
+      attempts++;
+    }
+    this.currentTurn = next;
+
+
+    const cp = this.players[this.currentTurn];
+    cp.drawnThisTurn = false; // reset draw for new turn
+
+
+    if (cp.silenced) {
+      cp.silencedTurns--;
+      if (cp.silencedTurns <= 0) cp.silenced = false;
+      UIController.setLog(`${cp.name} is silenced — turn skipped!`);
+      UIController.renderGame();
+      this.aiThinkingTimer = setTimeout(() => this.nextTurn(), 1100);
+      return;
+    }
+
+
+    UIController.renderGame();
+    if (this.currentTurn !== 0) {
+      this.aiThinkingTimer = setTimeout(() => AIController.takeTurn(cp), 1400);
+    }
+  },
+
+
+  checkFactionWin() {
+    const living = this.players.filter(p => p.isAlive);
+    const goodAlive = living.filter(p => p.role.team === 'good').length;
+    const evilAlive = living.filter(p => p.role.team === 'evil').length;
+    if (evilAlive === 0) {
+      this.endGame('good', 'All Shadow Court members have been eliminated. The realm is saved!');
+    } else if (goodAlive === 0) {
+      this.endGame('evil', 'The Shadow Court has prevailed. Darkness covers the realm.');
+    }
+  },
+
+
+  endGame(winTeam, message) {
+    if (this.gameOver) return;
+    this.gameOver = true;
+    if (this.aiThinkingTimer) clearTimeout(this.aiThinkingTimer);
+    UIController.showGameOver(winTeam, message, this.players);
+  }
+};
