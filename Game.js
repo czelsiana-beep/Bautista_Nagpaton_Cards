@@ -129,3 +129,42 @@ class Player {
     return !this.eliminated;
   }
 }
+
+// ============================================================
+// ROLE DATA
+// ============================================================
+const ROLES = [
+  {
+    id: 'mage', name: 'The Mage', emoji: '🔮', team: 'good',
+    desc: "You know who the evil players are. Stay hidden. If Nica guesses you are the Mage — evil wins!",
+    ability: 'REVEAL VISION',
+    abilityDesc: 'You see evil players secretly. No active ability — your power is knowledge.'
+  },
+  {
+    id: 'jose', name: 'Jose', emoji: '⚔️', team: 'good',
+    desc: "Strike one player. If evil → they're eliminated. If good → you lose 2 cards.",
+    ability: '⚔️ STRIKE',
+    abilityDesc: 'Eliminate a player. Right guess = great. Wrong guess = lose 2 cards.'
+  },
+  {
+    id: 'carl', name: 'Carl', emoji: '🛡️', team: 'good',
+    desc: 'Shield yourself or an ally from the next ability used against them.',
+    ability: '🛡️ SHIELD',
+    abilityDesc: 'Protect a player from the next ability aimed at them.'
+  },
+  {
+    id: 'louise', name: 'Louise', emoji: '👑', team: 'evil',
+    desc: "You are the Shadow Queen. Use 3 abilities to destroy the Mage's team.",
+    ability: '👑 POWERS',
+    abilityDesc: 'Corrupt Draw / False Vision / Silence Curse'
+  },
+  {
+    id: 'nica', name: 'Nica', emoji: '🕷️', team: 'evil',
+    desc: 'Find and expose the Mage. If you guess correctly once — evil wins instantly.',
+    ability: '🕷️ HUNT',
+    abilityDesc: 'Guess which player is the Mage. Correct = Evil wins!'
+  },
+];
+
+
+const AI_NAMES = ['Sir Aldric', 'Lady Maren', 'Thane Bors', 'Ser Voss', 'Dame Elara', 'Lord Fenwick'];
