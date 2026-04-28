@@ -460,3 +460,147 @@ const AIController = {
   }
 };
 
+// ============================================================
+// UI CONTROLLER
+// ============================================================
+const UIController = {
+  toastTimer: null,
+  targetCallback: null,
+
+
+  showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0, 0);
+  },
+
+
+  renderGame() {
+    this.renderOpponents();
+    this.renderDiscardPile();
+    this.renderPlayerHand();
+    this.renderAbilities();
+    const cp = GameManager.currentPlayer;
+    document.getElementById('turn-name').textContent = cp ? cp.name : '—';
+    document.getElementById('deck-count').textContent = GameManager.deck.count;
+    const human = GameManager.humanPlayer;
+    document.getElementById('player-name-tag').textContent = `${human.role.emoji} ${human.name}`;
+
+
+    const pz = document.getElementById('player-zone');
+    pz.classList.toggle('my-turn', GameManager.currentTurn === 0);
+
+
+    // Draw deck clickability
+    const drawDeckEl = document.getElementById('draw-deck');
+    if (human.drawnThisTurn || GameManager.currentTurn !== 0) {
+      drawDeckEl.classList.add('already-drawn');
+    } else {
+      drawDeckEl.classList.remove('already-drawn');
+    }
+  },
+
+
+  renderOpponents() {
+    const row = document.getElementById('opponents-row');
+    row.innerHTML = '';
+    const opponents = GameManager.players.filter(p => p.id !== 0);
+    if (opponents.length === 0) return;
+
+
+    for (const p of opponents) {
+      const isActive = GameManager.currentTurn === p.id;
+      const el = document.createElement('div');
+      el.className = 'opponent-zone' + (isActive ? ' active-turn' : '') + (p.eliminated ? ' eliminated' : '');
+      el.innerHTML = `
+        ${p.abilityUsed ? '<div class="ability-used-badge">Used</div>' : ''}
+        ${isActive && !p.eliminated ? '<div class="ai-thinking-badge">⚙ Thinking</div>' : ''}
+        <div class="opp-name">${p.role.emoji} ${p.name}</div>
+        <div class="opp-cards">${p.hand.map(() => '<div class="opp-card-back">🂠</div>').join('')}</div>
+        <div class="opp-tag">${p.hand.length} cards${p.shielded ? ' 🛡️' : ''}${p.silenced ? ' 🤫' : ''}${p.eliminated ? ' 💀' : ''}</div>
+      `;
+      row.appendChild(el);
+    }
+  },
+
+
+  renderDiscardPile() {
+    const topCard = GameManager.discard[GameManager.discard.length - 1];
+    const pile = document.getElementById('discard-pile');
+    const numEl = document.getElementById('top-card-num');
+    const clrEl = document.getElementById('top-card-color');
+    pile.className = 'discard-pile';
+    if (!topCard) { numEl.textContent = '—'; clrEl.textContent = '—'; return; }
+    const displayColor = GameManager.currentColor || topCard.color;
+    pile.classList.add(`card-${displayColor}`);
+    numEl.textContent = topCard.isCurse ? '☠️' : topCard.number;
+    clrEl.textContent = displayColor.toUpperCase();
+  },
+
+
+  renderPlayerHand() {
+    const container = document.getElementById('hand-cards');
+    container.innerHTML = '';
+    const player = GameManager.humanPlayer;
+
+
+    if (player.eliminated) {
+      container.innerHTML = '<div style="color:#f06060;font-size:14px;padding:10px;">You have been eliminated from the game.</div>';
+      return;
+    }
+
+
+    const isMyTurn = GameManager.currentTurn === 0;
+
+
+    player.hand.forEach((card, idx) => {
+      const canPlay = isMyTurn && card.canPlayOn(GameManager.currentColor, GameManager.currentNumber);
+      const div = document.createElement('div');
+      div.className = `card ${card.cssClass}${canPlay ? '' : ' unplayable'}`;
+      div.innerHTML = `
+        <div class="card-num">${card.displayValue}</div>
+        <div class="card-clr">${card.isCurse ? 'CURSE' : card.color}</div>
+      `;
+      if (canPlay) div.addEventListener('click', () => this.onPlayerPlayCard(idx));
+      container.appendChild(div);
+    });
+  },
+
+
+  renderAbilities() {
+    const panel = document.getElementById('ability-panel');
+    panel.innerHTML = '';
+    const player = GameManager.humanPlayer;
+    if (player.eliminated) return;
+
+
+    const role = player.role;
+
+
+    if (role.id === 'mage') {
+      const info = document.createElement('div');
+      info.style.cssText = 'font-size:12px;color:rgba(244,232,193,0.4);padding:8px;font-style:italic;text-align:center;';
+      info.textContent = '🔮 You are the Mage. Your power is knowledge — guide your allies wisely.';
+      panel.appendChild(info);
+      return;
+    }
+
+
+    const addBtn = (emoji, name, desc, used, handler, isEvil) => {
+      const btn = document.createElement('div');
+      btn.className = `ability-btn${isEvil ? ' evil-ab' : ''}${used ? ' used' : ''}`;
+      btn.innerHTML = `<div class="ab-emoji">${emoji}</div><div class="ab-name">${name}</div><div class="ab-desc">${desc}</div>`;
+      if (!used) btn.addEventListener('click', handler);
+      panel.appendChild(btn);
+    };
+
+
+    if (role.id === 'jose') addBtn('⚔️', 'STRIKE', 'Eliminate one player (risky!)', player.abilityUsed, () => this.activateJose(), false);
+    if (role.id === 'carl') addBtn('🛡️', 'SHIELD', 'Protect a player from next ability', player.abilityUsed, () => this.activateCarl(), false);
+    if (role.id === 'louise') {
+      addBtn('💀', 'CORRUPT DRAW', '+2 cards on a target', player.abilityUsed, () => this.activateLouise('corrupt'), true);
+      addBtn('👁️', 'FALSE VISION', "Peek a player's alignment", player.abilityUsed, () => this.activateLouise('vision'), true);
+      addBtn('🤫', 'SILENCE CURSE', 'Skip target ability for 1 turn', player.abilityUsed, () => this.activateLouise('silence'), true);
+    }
+    if (role.id === 'nica') addBtn('🕵️', 'HUNT MAGE', 'Guess the Mage — Win if correct!', player.abilityUsed, () => this.activateNica(), true);
+  },
