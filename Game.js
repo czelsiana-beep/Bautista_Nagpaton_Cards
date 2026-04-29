@@ -796,3 +796,104 @@ const UIController = {
     this.toastTimer = setTimeout(() => t.remove(), 2800);
   }
 };
+
+// ============================================================
+// MENU STATE
+// ============================================================
+let selectedOpponents = 1; // default 1 opponent (2 players total)
+
+
+function initMenu() {
+  // Opponent count selection
+  document.querySelectorAll('.opp-select-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.opp-select-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedOpponents = parseInt(card.dataset.opponents);
+    });
+  });
+}
+
+
+function startGame() {
+  const nameInput = document.getElementById('player-name-input').value.trim();
+  const humanName = nameInput || 'Noble Hero';
+
+
+  GameManager.init(humanName, selectedOpponents);
+  showRoleReveal();
+}
+
+
+function showRoleReveal() {
+  const human = GameManager.humanPlayer;
+  const role = human.role;
+  const isGood = role.team === 'good';
+
+
+  let extraInfo = '';
+  if (role.id === 'mage') {
+    const evilNames = GameManager.players
+      .filter(p => p.role.team === 'evil')
+      .map(p => `${p.role.emoji} ${p.name}`)
+      .join(', ');
+    extraInfo = `
+      <div class="role-ability-box" style="margin-top:8px;border-color:rgba(240,96,96,0.3);">
+        <strong>🔮 Secret Vision:</strong><br>
+        Evil players: <span style="color:#f06060">${evilNames}</span><br>
+        <em style="font-size:11px;opacity:.7">Guide allies — but never reveal this directly.</em>
+      </div>`;
+  }
+
+
+  document.getElementById('role-reveal-content').innerHTML = `
+    <div class="role-reveal-card">
+      <div class="role-reveal-header ${isGood ? 'good-team' : 'evil-team'}">
+        <div class="role-reveal-emoji">${role.emoji}</div>
+        <div class="role-reveal-name">${role.name}</div>
+        <div class="role-reveal-team" style="color:${isGood ? '#6ab0f5' : '#f06060'}">
+          ${isGood ? '⚔️ Loyal Servant of Rina' : '☠️ Shadow Court — Evil'}
+        </div>
+      </div>
+      <div class="role-reveal-body">
+        <p>${role.desc}</p>
+        <div class="role-ability-box">
+          <strong>Your Ability:</strong> ${role.ability}<br>
+          <span style="opacity:.8">${role.abilityDesc}</span>
+        </div>
+        ${extraInfo}
+      </div>
+    </div>`;
+
+
+  UIController.showScreen('screen-role');
+}
+
+
+function proceedAfterRole() {
+  UIController.renderGame();
+  UIController.showScreen('screen-game');
+  UIController.setLog(`The game begins! It is ${GameManager.currentPlayer.name}'s turn.`);
+  if (GameManager.currentTurn !== 0) {
+    setTimeout(() => AIController.takeTurn(GameManager.currentPlayer), 1400);
+  }
+}
+
+
+function showCodex() { UIController.showScreen('screen-codex'); }
+function showCodexInGame() { UIController.showScreen('screen-codex'); }
+function showMenu() { UIController.showScreen('screen-menu'); }
+function cancelTarget() { UIController.closeTarget(); }
+function playerDrawCard() { UIController.onPlayerDrawCard(); }
+
+
+
+
+
+// ============================================================
+// BOOT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  initMenu();
+});
+
