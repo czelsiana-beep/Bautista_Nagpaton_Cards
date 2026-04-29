@@ -87,6 +87,57 @@ Click ↩ Return to Menu on the Game Over screen
 
 Note: Unplayable cards appear dimmed. You cannot draw more than once per turn.
 
+📁 Project Structure
+colors-of-deception/
+│
+├── index.html        # Main HTML — all screens and game structure
+├── style.css         # Full visual theme — dark fantasy UI
+├── game.js           # All game logic — OOP architecture
+└── README.md         # This file
+
+Architecture Overview (game.js)
+Card          — Represents a single card (color, number, curse flag)
+Deck          — Builds, shuffles, draws, and reshuffles the card pool
+Player        — Holds hand, role, status flags (shielded, silenced, etc.)
+GameManager   — Core game loop: turns, card play, draw, win conditions
+AIController  — Autonomous AI turn logic and ability decisions
+UIController  — All DOM rendering, overlays, toasts, and screen transitions
+
+
+🖼️ Screenshots
+(Replace the placeholder paths below with actual screenshots of your build)
+Screen
+Preview
+Main Menu
+screenshots/menu.png
+Role Reveal
+screenshots/role-reveal.png
+Gameplay
+screenshots/gameplay.png
+Game Over
+screenshots/gameover.png
+
+
+👥 Team
+Member
+Role
+GitHub
+(Bautista, Rinamae Czel Sianna)
+(e.g. UI, CSS / JS)
+@username
+(Nagpaton, Francesca Louise May G.)
+(e.g., UI / CSS / HTML)
+@username
+
+Course: Programming 2 — 2-Week Game Sprint School: UPHSD Molino — College of Computer Studies
+
+📝 License
+This project was created for academic purposes under the UPHSD Programming 2 course sprint.
+
+⚜️ May your hand be full and your enemies revealed.
+
+
+
 
 
 
