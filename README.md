@@ -35,6 +35,59 @@ Hunt the Mage — guess correctly once and evil wins instantly
 🏆 Win Conditions
 🟦 Good Team Wins: Any good player empties their hand, OR all evil players are eliminated
 🟥 Evil Team Wins: Nica correctly identifies the Mage, OR all good players are eliminated
+🚀 Setup & How to Run
+No installations, no dependencies. Just a browser.
+Option 1 — Open Directly
+1. Download or clone this repository
+2. Open index.html in any modern web browser
+3. That's it — the game runs immediately
+
+Option 2 — Clone via Git
+git clone https://github.com/YOUR-USERNAME/colors-of-deception.git
+cd colors-of-deception
+# Open index.html in your browser
+
+Option 3 — Live Server (Recommended for Development)
+If you have VS Code with the Live Server extension:
+1. Open the project folder in VS Code
+2. Right-click index.html → "Open with Live Server"
+
+Browser Compatibility
+Browser
+Support
+Chrome 90+
+✅ Full
+Firefox 88+
+✅ Full
+Edge 90+
+✅ Full
+Safari 14+
+✅ Full
+Mobile (iOS/Android)
+✅ Responsive
+
+
+🕹️ Controls
+Action
+How
+Play a card
+Click any highlighted card in your hand
+Draw a card
+Click the 🂠 Draw deck in the center
+Use your ability
+Click the ability button in the ability panel
+Choose a target
+Click a player card in the target overlay
+Cancel target
+Click the ✕ Cancel button
+Read the rules
+Click 📜 Rules in the game header
+Return to menu
+Click ↩ Return to Menu on the Game Over screen
+
+Note: Unplayable cards appear dimmed. You cannot draw more than once per turn.
+
+
 
 
 
