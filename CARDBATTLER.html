@@ -1,124 +1,655 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Colors of Deception</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Colors of Deception</title>
+<link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #f0d070;
+    --gold-dark: #7a5c1e;
+    --parchment: #f4e8c1;
+    --parchment-dark: #d4c090;
+    --blood: #8b1a1a;
+    --blood-light: #c0392b;
+    --deep-navy: #0a0e1a;
+    --navy: #111827;
+    --navy-mid: #1e2a3a;
+    --stone: #2a2a3a;
+    --stone-light: #3a3a4a;
+    --good-blue: #1a4a8a;
+    --good-blue-light: #2e6db4;
+    --evil-purple: #4a1a6a;
+    --evil-purple-light: #7b2d8b;
+    --red-card: #c0392b;
+    --blue-card: #1a5fa8;
+    --green-card: #1a7a3a;
+    --yellow-card: #b8860b;
+
+    --r: #e74c3c;
+    --b: #2980b9;
+    --g: #27ae60;
+    --y: #f39c12;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'IM Fell English', serif;
+    background: var(--deep-navy);
+    color: var(--parchment);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ===== BACKGROUNDS ===== */
+  .bg-texture {
+    position: fixed; inset:0; z-index:0;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(201,168,76,0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(139,26,26,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(10,14,26,1) 0%, rgba(5,7,15,1) 100%);
+  }
+  .bg-texture::before {
+    content:'';
+    position:fixed; inset:0;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9a84c' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  /* ===== SCREENS ===== */
+  .screen { position:relative; z-index:1; display:none; min-height:100vh; }
+  .screen.active { display:flex; flex-direction:column; align-items:center; justify-content:center; }
+
+  /* ===== MENU ===== */
+  #screen-menu {
+    padding: 20px;
+    text-align: center;
+    gap: 0;
+  }
+
+  .menu-crest {
+    font-size: 60px;
+    margin-bottom: 10px;
+    filter: drop-shadow(0 0 20px rgba(201,168,76,0.5));
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+
+  .game-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(28px, 6vw, 52px);
+    font-weight: 700;
+    color: var(--gold-light);
+    text-shadow: 0 0 30px rgba(201,168,76,0.6), 2px 2px 0 var(--gold-dark);
+    letter-spacing: 2px;
+    line-height: 1.2;
+  }
+  .game-subtitle {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(11px,2.5vw,15px);
+    color: var(--parchment-dark);
+    letter-spacing: 6px;
+    margin: 8px 0 30px;
+    text-transform: uppercase;
+  }
+
+  .divider {
+    width: 300px; max-width:90vw;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 0 auto 30px;
+  }
+
+  .name-input-wrap {
+    background: rgba(201,168,76,0.08);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 8px;
+    padding: 20px 30px;
+    margin-bottom: 25px;
+    width: 360px; max-width:90vw;
+  }
+  .name-input-wrap label {
+    font-family:'Cinzel',serif;
+    font-size:11px;
+    letter-spacing:3px;
+    color:var(--gold);
+    text-transform:uppercase;
+    display:block;
+    margin-bottom:10px;
+  }
+  .name-input-wrap input {
+    width:100%;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(201,168,76,0.4);
+    border-radius:4px;
+    padding:10px 14px;
+    font-family:'IM Fell English',serif;
+    font-size:18px;
+    color:var(--parchment);
+    outline:none;
+    transition:.2s;
+  }
+  .name-input-wrap input:focus { border-color:var(--gold); background:rgba(201,168,76,0.05); }
+  .name-input-wrap input::placeholder { color:rgba(244,232,193,0.3); }
+
+  .player-count-wrap {
+    background: rgba(201,168,76,0.08);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius:8px;
+    padding:16px 24px;
+    margin-bottom:25px;
+    width:360px; max-width:90vw;
+    text-align:center;
+  }
+  .player-count-wrap label {
+    font-family:'Cinzel',serif; font-size:11px; letter-spacing:3px; color:var(--gold);
+    text-transform:uppercase; display:block; margin-bottom:12px;
+  }
+  .count-btns { display:flex; gap:8px; justify-content:center; }
+  .count-btn {
+    width:44px; height:44px; border-radius:50%;
+    border:2px solid rgba(201,168,76,0.4);
+    background:rgba(0,0,0,0.3);
+    color:var(--parchment);
+    font-family:'Cinzel',serif; font-size:16px; font-weight:700;
+    cursor:pointer; transition:.2s;
+  }
+  .count-btn:hover { border-color:var(--gold); background:rgba(201,168,76,0.1); }
+  .count-btn.selected { border-color:var(--gold); background:rgba(201,168,76,0.2); color:var(--gold-light); }
+
+  .btn-primary {
+    font-family:'Cinzel',serif;
+    font-size:14px; font-weight:700;
+    letter-spacing:3px; text-transform:uppercase;
+    background: linear-gradient(135deg, #7a5c1e, #c9a84c, #7a5c1e);
+    color: var(--deep-navy);
+    border:none; border-radius:4px;
+    padding:14px 40px;
+    cursor:pointer;
+    transition:.2s;
+    box-shadow: 0 4px 20px rgba(201,168,76,0.3);
+    margin: 5px;
+  }
+  .btn-primary:hover { transform:translateY(-2px); box-shadow:0 6px 30px rgba(201,168,76,0.5); }
+  .btn-primary:active { transform:translateY(0); }
+
+  .btn-secondary {
+    font-family:'Cinzel',serif; font-size:12px; letter-spacing:2px;
+    background:transparent;
+    color:var(--parchment-dark);
+    border:1px solid rgba(244,232,193,0.2);
+    border-radius:4px;
+    padding:10px 28px;
+    cursor:pointer; transition:.2s; margin:5px;
+  }
+  .btn-secondary:hover { border-color:var(--gold); color:var(--gold); }
+
+  /* ===== CODEX SCREEN ===== */
+  #screen-codex {
+    padding:20px;
+    justify-content:flex-start;
+    padding-top:30px;
+  }
+  .codex-inner {
+    width:700px; max-width:95vw;
+    background:rgba(10,14,26,0.95);
+    border:1px solid rgba(201,168,76,0.3);
+    border-radius:12px;
+    padding:30px;
+  }
+  .codex-title {
+    font-family:'Cinzel Decorative',serif; font-size:22px;
+    color:var(--gold-light); text-align:center; margin-bottom:20px;
+  }
+  .codex-section { margin-bottom:22px; }
+  .codex-section h3 {
+    font-family:'Cinzel',serif; font-size:13px; letter-spacing:3px;
+    color:var(--gold); text-transform:uppercase; margin-bottom:10px;
+    border-bottom:1px solid rgba(201,168,76,0.2); padding-bottom:6px;
+  }
+  .codex-section p, .codex-section li {
+    font-size:14px; line-height:1.7; color:var(--parchment-dark); margin-bottom:6px;
+  }
+  .codex-section ul { padding-left:20px; }
+  .role-card-mini {
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(201,168,76,0.15);
+    border-radius:8px; padding:12px; margin-bottom:8px;
+  }
+  .role-card-mini .role-name {
+    font-family:'Cinzel',serif; font-size:13px; font-weight:700; margin-bottom:4px;
+  }
+  .role-card-mini .role-desc { font-size:13px; color:var(--parchment-dark); line-height:1.6; }
+  .good { color: #6ab0f5; }
+  .evil { color: #f06060; }
+
+  /* ===== ROLE REVEAL SCREEN ===== */
+  #screen-role { background:rgba(0,0,0,0.8); }
+  .role-reveal-card {
+    width:320px; max-width:92vw;
+    border-radius:16px; overflow:hidden;
+    box-shadow:0 0 60px rgba(201,168,76,0.3);
+    animation:revealCard .6s ease-out;
+  }
+  @keyframes revealCard {
+    from { transform:scale(.7) rotateY(90deg); opacity:0; }
+    to { transform:scale(1) rotateY(0); opacity:1; }
+  }
+  .role-reveal-header {
+    padding:30px 20px 20px;
+    text-align:center;
+  }
+  .role-reveal-emoji { font-size:52px; margin-bottom:10px; }
+  .role-reveal-name {
+    font-family:'Cinzel Decorative',serif; font-size:20px; font-weight:700;
+    margin-bottom:4px;
+  }
+  .role-reveal-team {
+    font-family:'Cinzel',serif; font-size:11px; letter-spacing:3px; text-transform:uppercase;
+    margin-bottom:4px;
+  }
+  .role-reveal-body {
+    background:rgba(0,0,0,0.5);
+    padding:20px;
+  }
+  .role-reveal-body p { font-size:14px; line-height:1.7; margin-bottom:10px; }
+  .role-ability-box {
+    background:rgba(255,255,255,0.06);
+    border-radius:8px; padding:12px;
+    font-size:13px; line-height:1.6;
+  }
+  .role-ability-box strong { color:var(--gold-light); }
+  .good-team { background:linear-gradient(135deg,#0f2d5a,#1a4a8a); }
+  .evil-team { background:linear-gradient(135deg,#2d0a3a,#4a1a6a); }
+
+  /* ===== GAME SCREEN ===== */
+  #screen-game {
+    padding:0;
+    justify-content:flex-start;
+    min-height:100vh;
+    position:relative;
+  }
+
+  .game-header {
+    width:100%; padding:10px 16px;
+    background:rgba(0,0,0,0.6);
+    border-bottom:1px solid rgba(201,168,76,0.2);
+    display:flex; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; gap:8px;
+  }
+  .game-logo { font-family:'Cinzel Decorative',serif; font-size:14px; color:var(--gold); }
+  .turn-indicator {
+    font-family:'Cinzel',serif; font-size:12px; letter-spacing:2px;
+    color:var(--parchment-dark); text-transform:uppercase;
+  }
+  .turn-indicator span { color:var(--gold-light); font-weight:700; }
+
+  /* PLAYER ZONES — top/sides */
+  .opponents-row {
+    display:flex; justify-content:center; gap:10px;
+    padding:10px 10px 0;
+    width:100%; flex-wrap:wrap;
+  }
+  .opponent-zone {
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(201,168,76,0.15);
+    border-radius:10px;
+    padding:8px 12px;
+    min-width:120px; max-width:160px;
+    text-align:center;
+    position:relative;
+    transition:.3s;
+  }
+  .opponent-zone.active-turn { border-color:var(--gold); box-shadow:0 0 12px rgba(201,168,76,0.4); }
+  .opponent-zone.eliminated {
+    opacity:.4; filter:grayscale(1);
+  }
+  .opp-name { font-family:'Cinzel',serif; font-size:11px; font-weight:700; color:var(--gold); }
+  .opp-emoji { font-size:22px; margin:2px 0; }
+  .opp-cards {
+    display:flex; gap:3px; justify-content:center; flex-wrap:wrap; margin-top:4px;
+  }
+  .opp-card-back {
+    width:18px; height:26px; border-radius:3px;
+    background:linear-gradient(135deg,#1a2a4a,#0f1a2e);
+    border:1px solid rgba(201,168,76,0.3);
+    font-size:8px; display:flex; align-items:center; justify-content:center;
+    color:rgba(201,168,76,0.5);
+  }
+  .opp-tag {
+    font-size:9px; letter-spacing:1px; text-transform:uppercase;
+    color:rgba(244,232,193,0.4); margin-top:3px;
+  }
+  .ability-used-badge {
+    position:absolute; top:4px; right:4px;
+    background:rgba(139,26,26,0.8); border-radius:3px;
+    font-size:9px; padding:1px 4px; color:#f06060;
+  }
+
+  /* CENTER PLAY AREA */
+  .play-area {
+    flex:1; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; gap:12px; padding:10px;
+    min-height:200px;
+  }
+  .discard-pile-wrap {
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+  }
+  .discard-label {
+    font-family:'Cinzel',serif; font-size:10px; letter-spacing:3px;
+    text-transform:uppercase; color:rgba(244,232,193,0.4);
+  }
+  .discard-pile {
+    width:80px; height:110px;
+    border-radius:10px;
+    border:3px solid rgba(255,255,255,0.2);
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    font-size:28px; font-weight:900;
+    position:relative;
+    box-shadow:0 4px 20px rgba(0,0,0,0.5);
+    font-family:'Cinzel',serif;
+    transition:.2s;
+  }
+  .discard-pile .card-number { font-size:36px; font-weight:900; line-height:1; }
+  .discard-pile .card-color-name { font-size:9px; letter-spacing:2px; margin-top:4px; opacity:.7; }
+
+  .draw-deck-wrap {
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+  }
+  .draw-deck {
+    width:80px; height:110px; border-radius:10px;
+    background:linear-gradient(135deg,#1a2a4a,#0f1a2e);
+    border:2px solid rgba(201,168,76,0.4);
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:4px;
+    cursor:pointer; transition:.2s;
+    box-shadow:4px 4px 0 rgba(0,0,0,0.4);
+  }
+  .draw-deck:hover { transform:translateY(-3px); box-shadow:4px 7px 0 rgba(0,0,0,0.4); border-color:var(--gold); }
+  .draw-deck-icon { font-size:24px; }
+  .draw-deck-label { font-family:'Cinzel',serif; font-size:9px; letter-spacing:2px; color:var(--gold); }
+  .draw-deck-count { font-size:11px; color:var(--parchment-dark); }
+
+  .center-row { display:flex; gap:20px; align-items:center; }
+
+  /* ACTION LOG */
+  .action-log {
+    background:rgba(0,0,0,0.5);
+    border:1px solid rgba(201,168,76,0.2);
+    border-radius:8px;
+    padding:10px 14px;
+    width:min(500px,96vw);
+    min-height:50px;
+    text-align:center;
+    font-size:15px;
+    line-height:1.5;
+    color:var(--parchment);
+  }
+  .action-log.big-announce {
+    font-family:'Cinzel',serif;
+    font-size:clamp(14px,3.5vw,18px);
+    color:var(--gold-light);
+    border-color:var(--gold);
+    animation:pulse-glow 1s ease-in-out;
+  }
+  @keyframes pulse-glow {
+    0%,100%{box-shadow:0 0 0 rgba(201,168,76,0)}
+    50%{box-shadow:0 0 20px rgba(201,168,76,0.5)}
+  }
+
+  /* PLAYER HAND */
+  .player-zone {
+    width:100%; padding:10px 12px 12px;
+    background:rgba(0,0,0,0.4);
+    border-top:1px solid rgba(201,168,76,0.2);
+  }
+  .player-info-row {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:8px; flex-wrap:wrap; gap:6px;
+  }
+  .player-name-tag {
+    font-family:'Cinzel',serif; font-size:13px; font-weight:700; color:var(--gold);
+  }
+  .player-hand-label {
+    font-family:'Cinzel',serif; font-size:10px; letter-spacing:2px;
+    text-transform:uppercase; color:rgba(244,232,193,0.5);
+  }
+
+  .hand-cards {
+    display:flex; gap:6px; flex-wrap:wrap; justify-content:center;
+    padding-bottom:4px;
+  }
+
+  /* CARDS */
+  .card {
+    width:64px; height:90px; border-radius:9px;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    cursor:pointer; border:2px solid rgba(255,255,255,0.2);
+    position:relative; transition:.18s;
+    box-shadow:2px 3px 8px rgba(0,0,0,0.5);
+    flex-shrink:0;
+  }
+  .card:hover { transform:translateY(-10px) scale(1.05); box-shadow:2px 10px 20px rgba(0,0,0,0.6); border-color:rgba(255,255,255,0.6); }
+  .card.unplayable { opacity:.45; cursor:not-allowed; }
+  .card.unplayable:hover { transform:none; box-shadow:2px 3px 8px rgba(0,0,0,0.5); border-color:rgba(255,255,255,0.2); }
+  .card-num { font-family:'Cinzel',serif; font-weight:900; font-size:26px; line-height:1; }
+  .card-clr { font-size:8px; letter-spacing:2px; text-transform:uppercase; opacity:.7; margin-top:2px; }
+  .card-curse { font-size:18px; position:absolute; top:4px; right:5px; }
+
+  .card-red    { background:linear-gradient(135deg,#7b1111,#c0392b); }
+  .card-blue   { background:linear-gradient(135deg,#0f3a70,#1a5fa8); }
+  .card-green  { background:linear-gradient(135deg,#0f4a22,#1a7a3a); }
+  .card-yellow { background:linear-gradient(135deg,#6b4e00,#b8860b); }
+  .card-curse-bg { background:linear-gradient(135deg,#2d0a3a,#4a0a0a); border-color:rgba(240,96,96,0.5)!important; }
+
+  /* ABILITY PANEL */
+  .ability-panel {
+    width:100%; padding:8px 12px;
+    background:rgba(0,0,0,0.3);
+    border-top:1px solid rgba(201,168,76,0.15);
+    display:flex; gap:8px; justify-content:center; flex-wrap:wrap;
+  }
+  .ability-btn {
+    background:rgba(201,168,76,0.1);
+    border:1px solid rgba(201,168,76,0.3);
+    border-radius:8px;
+    padding:8px 14px;
+    cursor:pointer; transition:.2s;
+    text-align:center; min-width:120px;
+  }
+  .ability-btn:hover { background:rgba(201,168,76,0.2); border-color:var(--gold); }
+  .ability-btn.used { opacity:.4; cursor:not-allowed; filter:grayscale(.7); }
+  .ability-btn .ab-emoji { font-size:20px; }
+  .ability-btn .ab-name { font-family:'Cinzel',serif; font-size:10px; font-weight:700; color:var(--gold-light); letter-spacing:1px; margin-top:3px; }
+  .ability-btn .ab-desc { font-size:10px; color:var(--parchment-dark); line-height:1.4; margin-top:2px; }
+  .ability-btn.evil-ab { border-color:rgba(240,96,96,0.3); background:rgba(139,26,26,0.1); }
+  .ability-btn.evil-ab:hover { background:rgba(139,26,26,0.25); border-color:#f06060; }
+
+  /* TARGET OVERLAY */
+  .target-overlay {
+    position:fixed; inset:0; z-index:100;
+    background:rgba(0,0,0,0.75);
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    gap:16px;
+    display:none;
+  }
+  .target-overlay.show { display:flex; }
+  .target-title {
+    font-family:'Cinzel Decorative',serif; font-size:20px;
+    color:var(--gold-light);
+    text-align:center; padding:0 20px;
+  }
+  .target-subtitle { font-size:14px; color:var(--parchment-dark); text-align:center; }
+  .target-list { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; padding:0 20px; }
+  .target-card {
+    background:rgba(255,255,255,0.06);
+    border:2px solid rgba(201,168,76,0.3);
+    border-radius:12px; padding:16px 20px;
+    cursor:pointer; transition:.2s; text-align:center; min-width:100px;
+  }
+  .target-card:hover { border-color:var(--gold); background:rgba(201,168,76,0.1); transform:scale(1.05); }
+  .target-card .tc-emoji { font-size:30px; }
+  .target-card .tc-name { font-family:'Cinzel',serif; font-size:12px; font-weight:700; color:var(--gold); margin-top:6px; }
+  .btn-cancel {
+    background:transparent; border:1px solid rgba(255,255,255,0.2);
+    border-radius:4px; padding:8px 24px;
+    color:var(--parchment-dark); cursor:pointer; font-family:'Cinzel',serif; font-size:12px;
+    transition:.2s;
+  }
+  .btn-cancel:hover { border-color:#f06060; color:#f06060; }
+
+  /* GAME OVER */
+  #screen-gameover { text-align:center; padding:30px 20px; gap:16px; }
+  .gameover-crest { font-size:70px; animation:float 3s ease-in-out infinite; }
+  .gameover-title {
+    font-family:'Cinzel Decorative',serif;
+    font-size:clamp(24px,6vw,44px); font-weight:700;
+    text-shadow:0 0 30px rgba(201,168,76,0.6);
+  }
+  .gameover-sub { font-size:16px; color:var(--parchment-dark); max-width:500px; line-height:1.7; }
+  .reveal-list { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin:10px 0; }
+  .reveal-badge {
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(201,168,76,0.2);
+    border-radius:8px; padding:10px 16px; text-align:center;
+  }
+  .reveal-badge .rb-emoji { font-size:24px; }
+  .reveal-badge .rb-name { font-family:'Cinzel',serif; font-size:11px; color:var(--gold); margin-top:4px; }
+  .reveal-badge .rb-role { font-size:11px; color:var(--parchment-dark); }
+
+  /* SILENCED badge */
+  .silenced-badge {
+    position:absolute; inset:0; border-radius:9px;
+    background:rgba(0,0,0,0.65);
+    display:flex; align-items:center; justify-content:center;
+    font-size:10px; font-family:'Cinzel',serif;
+    color:#aaa; flex-direction:column; gap:2px;
+  }
+
+  /* Notification toast */
+  .toast {
+    position:fixed; bottom:100px; left:50%; transform:translateX(-50%);
+    background:rgba(10,14,26,0.95);
+    border:1px solid var(--gold);
+    border-radius:8px; padding:12px 24px;
+    font-family:'Cinzel',serif; font-size:14px; color:var(--gold-light);
+    z-index:200; animation:toastIn .3s ease;
+    text-align:center; max-width:90vw;
+    pointer-events:none;
+  }
+  @keyframes toastIn { from{opacity:0;transform:translateX(-50%) translateY(10px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+
+  /* ===== COLOR CHOOSER ===== */
+  .color-chooser {
+    position:fixed; inset:0; z-index:150;
+    background:rgba(0,0,0,0.8);
+    display:none;
+    flex-direction:column;
+    align-items:center; justify-content:center; gap:16px;
+  }
+  .color-chooser.show { display:flex; }
+  .color-chooser-title { font-family:'Cinzel Decorative',serif; font-size:18px; color:var(--gold-light); }
+  .color-choices { display:flex; gap:12px; }
+  .color-choice {
+    width:70px; height:70px; border-radius:12px;
+    cursor:pointer; border:3px solid rgba(255,255,255,0.1);
+    display:flex; align-items:center; justify-content:center;
+    font-size:24px; transition:.2s;
+  }
+  .color-choice:hover { transform:scale(1.15); border-color:white; }
+  .cc-red { background:linear-gradient(135deg,#7b1111,#c0392b); }
+  .cc-blue { background:linear-gradient(135deg,#0f3a70,#1a5fa8); }
+  .cc-green { background:linear-gradient(135deg,#0f4a22,#1a7a3a); }
+  .cc-yellow { background:linear-gradient(135deg,#6b4e00,#b8860b); }
+
+  /* Highlight current player zone */
+  .player-zone.my-turn { box-shadow:0 0 0 2px var(--gold); }
+
+  /* Responsive */
+  @media(max-width:480px){
+    .card { width:52px; height:74px; }
+    .card-num { font-size:20px; }
+    .discard-pile,.draw-deck { width:68px; height:96px; }
+  }
+</style>
 </head>
 <body>
-
-
-<!-- Background Texture -->
 <div class="bg-texture"></div>
 
-
-<!-- ===================== MAIN MENU ===================== -->
+<!-- MAIN MENU -->
 <div class="screen active" id="screen-menu">
   <div class="menu-crest">⚜️</div>
   <div class="game-title">Colors of Deception</div>
   <div class="game-subtitle">A Game of Cards &amp; Hidden Shadows</div>
   <div class="divider"></div>
 
-
-  <!-- Player Name Input -->
   <div class="name-input-wrap">
     <label>Enter Your Name, Noble</label>
     <input type="text" id="player-name-input" placeholder="Your Name..." maxlength="20" />
   </div>
 
-
-  <!-- Opponent Count Selector -->
-  <div class="opponent-select-wrap">
-    <label>⚔️ Choose Your Opponents</label>
-    <div class="opponent-cards">
-
-
-      <div class="opp-select-card selected" data-opponents="1">
-        <span class="osc-count">1</span>
-        <span class="osc-label">Opponent</span>
-        <span class="osc-icons">🤖</span>
-      </div>
-
-
-      <div class="opp-select-card" data-opponents="2">
-        <span class="osc-count">2</span>
-        <span class="osc-label">Opponents</span>
-        <span class="osc-icons">🤖🤖</span>
-      </div>
-
-
-      <div class="opp-select-card" data-opponents="3">
-        <span class="osc-count">3</span>
-        <span class="osc-label">Opponents</span>
-        <span class="osc-icons">🤖🤖🤖</span>
-      </div>
-
-
-      <div class="opp-select-card" data-opponents="4">
-        <span class="osc-count">4</span>
-        <span class="osc-label">Opponents</span>
-        <span class="osc-icons">🤖🤖🤖🤖</span>
-      </div>
-
-
+  <div class="player-count-wrap">
+    <label>Number of Players</label>
+    <div class="count-btns">
+      <button class="count-btn selected" data-count="1">1</button>
+      <button class="count-btn" data-count="2">2</button>
+      <button class="count-btn" data-count="3">3</button>
+      <button class="count-btn" data-count="4">4</button>
+      <button class="count-btn" data-count="5">5</button>
     </div>
-    <div
-style="font-size:11px;color:rgba(244,232,193,0.4);margin-top:10px;text-align:center;font-family:'Cinzel',serif;letter-spacing:1px;">
-      All opponents are AI — they will think and play on their own
+    <div style="font-size:11px;color:rgba(244,232,193,0.4);margin-top:8px;">
+      Others will be AI if playing solo or with fewer players
     </div>
   </div>
-
 
   <button class="btn-primary" onclick="startGame()">⚔️ Begin the Game</button>
   <button class="btn-secondary" onclick="showCodex()">📜 Read the Codex</button>
 </div>
 
-<!-- ===================== CODEX ===================== -->
+<!-- CODEX -->
 <div class="screen" id="screen-codex" style="align-items:center;padding:20px 12px;justify-content:flex-start;padding-top:24px;">
   <div class="codex-inner">
     <div class="codex-title">📜 The Codex of Deception</div>
 
-
     <div class="codex-section">
       <h3>🎯 Goal</h3>
-      <p>This is a card game like UNO — but with <strong>hidden roles</strong>. Good players try to survive and empty their hand. Evil players try to deceive and destroy. Use cards + special abilities to outsmart the enemy faction.</p>
+      <p>This is a card game like UNO — but with <strong>hidden roles</strong>. Good players try to survive. Evil players try to destroy the Mage. Use cards + abilities to outsmart the enemy.</p>
     </div>
-
 
     <div class="codex-section">
       <h3>🃏 How Cards Work</h3>
       <ul>
         <li>Cards have a <strong>number (1–10)</strong> and a <strong>color (Red, Blue, Green, Yellow)</strong>.</li>
-        <li>On your turn: play a card that <strong>matches the color OR number</strong> of the top discard card.</li>
-        <li>If you can't play, <strong>draw one card</strong> from the deck (1 draw per turn max).</li>
-        <li><strong>Curse Cards ☠️</strong> — Drawing one forces your next turn to be skipped.</li>
-        <li>First good player to <strong>empty their hand wins</strong> — or the first team to eliminate all enemies.</li>
+        <li>On your turn: play a card that <strong>matches the color OR number</strong> of the top card on the pile.</li>
+        <li>If you can't play, <strong>draw a card</strong> from the deck.</li>
+        <li>Some cards are <strong>Curse Cards ☠️</strong> — drawing them forces you to skip a turn or lose a card.</li>
+        <li>First player to <strong>empty their hand</strong> wins — OR if a team's win condition is met.</li>
       </ul>
     </div>
-
 
     <div class="codex-section">
-      <h3>⚡ Special Abilities — One-Time Powers</h3>
+      <h3>⚡ Abilities — One-Time Powers (use ONCE per game)</h3>
       <ul>
-        <li><strong>🔮 The Mage</strong> — Sees all evil players from the start. Cannot tell anyone directly.</li>
-        <li><strong>⚔️ Jose</strong> — Strike: Choose a player. If evil → eliminated. If good → Jose loses 2 cards.</li>
-        <li><strong>🛡️ Carl</strong> — Shield: Protect any player from the next ability used against them.</li>
-        <li><strong>👑 Louise</strong> — Three powers: Corrupt Draw (+2 to target), False Vision (see alignment), Silence Curse (skip ability).</li>
-        <li><strong>🕷️ Nica</strong> — Hunt: Guess who the Mage is. Correct = Evil wins instantly.</li>
+        <li><strong>The Mage 🔮</strong> — Knows all evil players from the start. Cannot tell anyone directly.</li>
+        <li><strong>Jose ⚔️</strong> — Strike: Choose a player. If evil → eliminated. If good → Jose loses 2 cards.</li>
+        <li><strong>Carl 🛡️</strong> — Shield: Protect any player from the next ability used against them.</li>
+        <li><strong>Louise 👑</strong> — Has 3 abilities: Corrupt Draw (+2 cards to target), False Vision (see target alignment), Silence Curse (target skips ability use for 1 turn).</li>
+        <li><strong>Nica 🕷️</strong> — Hunt: Guess who the Mage is. If correct → Good team loses. If wrong → nothing.</li>
       </ul>
     </div>
-
 
     <div class="codex-section">
       <h3>🏆 Win Conditions</h3>
       <ul>
-        <li><span class="good">🟦 Good Team Wins:</span> Any good player empties their hand, OR all evil players are eliminated.</li>
-        <li><span class="evil">🟥 Evil Team Wins:</span> Nica correctly identifies the Mage, OR all good players are eliminated.</li>
+        <li><span class="good">🟦 Good Team Wins:</span> Any good player empties their hand first, OR Jose eliminates Louise.</li>
+        <li><span class="evil">🟥 Evil Team Wins:</span> Nica correctly identifies the Mage, OR Louise's Corrupt Draw leaves a good player with 10+ cards.</li>
       </ul>
     </div>
-
 
     <div class="codex-section">
       <h3>👥 The Roles</h3>
@@ -128,7 +659,7 @@ style="font-size:11px;color:rgba(244,232,193,0.4);margin-top:10px;text-align:cen
       </div>
       <div class="role-card-mini">
         <div class="role-name good">⚔️ Jose — Loyal Servant of Rina</div>
-        <div class="role-desc">Can eliminate one player. Kills evil = great. Kills good = Jose loses 2 cards as punishment.</div>
+        <div class="role-desc">Can eliminate one player. Kills evil = great win. Kills good = Jose loses 2 cards as punishment.</div>
       </div>
       <div class="role-card-mini">
         <div class="role-name good">🛡️ Carl — Loyal Servant of Rina</div>
@@ -136,62 +667,44 @@ style="font-size:11px;color:rgba(244,232,193,0.4);margin-top:10px;text-align:cen
       </div>
       <div class="role-card-mini">
         <div class="role-name evil">👑 Louise (The Malveraxis) — Shadow Court</div>
-        <div class="role-desc">Corrupt Draw, False Vision, Silence Curse. Three powerful abilities to disrupt good players.</div>
+        <div class="role-desc">Corrupt Draw, False Vision, Silence Curse. Three powerful one-time abilities to disrupt good players.</div>
       </div>
       <div class="role-card-mini">
         <div class="role-name evil">🕷️ Nica — Shadow Court</div>
-        <div class="role-desc">Hunts the Mage. If she guesses correctly — evil team wins immediately.</div>
+        <div class="role-desc">Hunts the Mage. If she guesses correctly once per game — the evil team wins immediately.</div>
       </div>
     </div>
 
-
-    <button class="btn-primary" onclick="showMenu()" style="width:100%;margin-top:4px;">← Back to Menu</button>
+    <button class="btn-primary" onclick="showScreen('screen-menu')" style="width:100%;margin-top:4px;">← Back to Menu</button>
   </div>
 </div>
 
-<!-- ===================== ROLE REVEAL ===================== -->
+<!-- ROLE REVEAL -->
 <div class="screen" id="screen-role">
   <div id="role-reveal-content"></div>
-  <button class="btn-primary" onclick="proceedAfterRole()" style="margin-top:16px;">I Understand My Role →</button>
+  <button class="btn-primary" id="role-ready-btn" onclick="proceedAfterRole()" style="margin-top:16px;">I Understand My Role →</button>
 </div>
 
-
-
-
-<!-- ===================== GAME SCREEN ===================== -->
-<div class="screen" id="screen-game">
-
-
-  <!-- Header -->
+<!-- GAME SCREEN -->
+<div class="screen" id="screen-game" style="min-height:100vh;justify-content:flex-start;">
   <div class="game-header">
     <div class="game-logo">⚜️ Colors of Deception</div>
     <div class="turn-indicator">Turn: <span id="turn-name">—</span></div>
-    <button class="btn-secondary" onclick="showCodexInGame()" style="padding:5px 12px;font-size:11px;">📜 Rules</button>
+    <button class="btn-secondary" onclick="showCodexInGame()" style="padding:5px 14px;font-size:11px;">📜 Rules</button>
   </div>
 
-
-  <!-- Opponents Row -->
   <div class="opponents-row" id="opponents-row"></div>
 
-
-  <!-- Central Play Area -->
   <div class="play-area">
     <div class="action-log" id="action-log">Waiting for the game to begin...</div>
     <div class="center-row">
-
-
-      <!-- Draw Deck -->
       <div class="draw-deck-wrap">
         <div class="draw-deck" id="draw-deck" onclick="playerDrawCard()">
           <div class="draw-deck-icon">🂠</div>
           <div class="draw-deck-label">Draw</div>
           <div class="draw-deck-count" id="deck-count">40</div>
         </div>
-        <div class="draw-limit-notice">1 per turn</div>
       </div>
-
-
-      <!-- Discard Pile -->
       <div class="discard-pile-wrap">
         <div class="discard-label">Current Card</div>
         <div class="discard-pile" id="discard-pile">
@@ -199,17 +712,11 @@ style="font-size:11px;color:rgba(244,232,193,0.4);margin-top:10px;text-align:cen
           <div class="card-color-name" id="top-card-color">—</div>
         </div>
       </div>
-
-
     </div>
   </div>
 
-
-  <!-- Ability Panel -->
   <div class="ability-panel" id="ability-panel"></div>
 
-
-  <!-- Human Player Zone -->
   <div class="player-zone" id="player-zone">
     <div class="player-info-row">
       <div class="player-name-tag" id="player-name-tag">Your Name</div>
@@ -219,17 +726,16 @@ style="font-size:11px;color:rgba(244,232,193,0.4);margin-top:10px;text-align:cen
   </div>
 </div>
 
-<!-- ===================== GAME OVER ===================== -->
+<!-- GAME OVER -->
 <div class="screen" id="screen-gameover">
   <div class="gameover-crest" id="go-crest">⚜️</div>
   <div class="gameover-title" id="go-title">Game Over</div>
   <div class="gameover-sub" id="go-sub">The battle has ended.</div>
   <div id="go-reveals" class="reveal-list"></div>
-  <button class="btn-primary" onclick="showMenu()" style="margin-top:12px;">↩ Return to Menu</button>
+  <button class="btn-primary" onclick="showScreen('screen-menu')" style="margin-top:10px;">↩ Return to Menu</button>
 </div>
 
-
-<!-- ===================== TARGET OVERLAY ===================== -->
+<!-- TARGET OVERLAY -->
 <div class="target-overlay" id="target-overlay">
   <div class="target-title" id="target-title">Choose a Target</div>
   <div class="target-subtitle" id="target-subtitle"></div>
@@ -237,9 +743,656 @@ style="font-size:11px;color:rgba(244,232,193,0.4);margin-top:10px;text-align:cen
   <button class="btn-cancel" onclick="cancelTarget()">✕ Cancel</button>
 </div>
 
+<!-- COLOR CHOOSER -->
+<div class="color-chooser" id="color-chooser">
+  <div class="color-chooser-title">Choose the new color</div>
+  <div class="color-choices">
+    <div class="color-choice cc-red" onclick="chooseColor('red')">🔴</div>
+    <div class="color-choice cc-blue" onclick="chooseColor('blue')">🔵</div>
+    <div class="color-choice cc-green" onclick="chooseColor('green')">🟢</div>
+    <div class="color-choice cc-yellow" onclick="chooseColor('yellow')">🟡</div>
+  </div>
+</div>
 
-<script src="game.js"></script>
+<script>
+// ============================================================
+// GAME DATA
+// ============================================================
+const ROLES = [
+  { id:'mage',    name:'The Mage',    emoji:'🔮', team:'good',  desc:'You know who the evil players are. Stay hidden. If Nica guesses you are the Mage — evil wins!', ability:'REVEAL VISION', abilityDesc:'You already see evil (shown privately). No active ability needed.' },
+  { id:'jose',    name:'Jose',        emoji:'⚔️', team:'good',  desc:'Strike one player. If evil → they\'re eliminated. If good → you lose 2 cards.', ability:'⚔️ STRIKE', abilityDesc:'Eliminate a player. Right guess = great. Wrong guess = lose 2 cards.' },
+  { id:'carl',    name:'Carl',        emoji:'🛡️', team:'good',  desc:'Shield yourself or an ally from the next ability used against them.', ability:'🛡️ SHIELD', abilityDesc:'Protect a player from the next ability aimed at them.' },
+  { id:'louise',  name:'Louise',      emoji:'👑', team:'evil',  desc:'You are the Shadow Queen. Use 3 abilities to destroy the Mage\'s team.', ability:'👑 POWERS', abilityDesc:'Corrupt Draw / False Vision / Silence Curse' },
+  { id:'nica',    name:'Nica',        emoji:'🕷️', team:'evil',  desc:'Find and expose the Mage. If you guess correctly once — evil wins instantly.', ability:'🕷️ HUNT', abilityDesc:'Guess which player is the Mage. Correct = Evil wins!' },
+];
+
+const AI_NAMES = ['Sir Aldric','Lady Maren','Thane Bors','Ser Voss','Dame Elara','Lord Fenwick','Abbess Tira'];
+const COLORS = ['red','blue','green','yellow'];
+const COLOR_EMOJI = { red:'🔴', blue:'🔵', green:'🟢', yellow:'🟡' };
+
+let G = {}; // Game State
+
+function makeCard(color, number, isCurse=false) {
+  return { color, number, isCurse };
+}
+
+function buildDeck() {
+  let deck = [];
+  for(let c of COLORS) {
+    for(let n=1; n<=10; n++) {
+      deck.push(makeCard(c,n));
+      if(n<=8) deck.push(makeCard(c,n)); // two of each low card
+    }
+  }
+  // Add curse cards
+  for(let i=0;i<8;i++) deck.push(makeCard(COLORS[i%4], '☠', true));
+  return shuffle(deck);
+}
+
+function shuffle(arr) {
+  for(let i=arr.length-1;i>0;i--){
+    let j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+
+// ============================================================
+// MENU
+// ============================================================
+let selectedCount = 1;
+document.querySelectorAll('.count-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.count-btn').forEach(b=>b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedCount = parseInt(btn.dataset.count);
+  });
+});
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  // scroll to top
+  window.scrollTo(0,0);
+}
+
+function showCodex() { showScreen('screen-codex'); }
+function showCodexInGame() { showScreen('screen-codex'); }
+
+function startGame() {
+  const nameInput = document.getElementById('player-name-input').value.trim();
+  const humanName = nameInput || 'Noble Hero';
+  const totalPlayers = Math.max(1, Math.min(5, selectedCount));
+
+  // Assign roles
+  const rolePool = shuffle([...ROLES]);
+  const usedRoles = rolePool.slice(0, totalPlayers);
+
+  // Build players
+  G.players = [];
+  for(let i=0;i<totalPlayers;i++){
+    const role = usedRoles[i];
+    const isHuman = (i===0);
+    G.players.push({
+      id: i,
+      name: isHuman ? humanName : AI_NAMES[i-1],
+      isHuman,
+      role,
+      hand: [],
+      abilityUsed: false,
+      shielded: false,
+      silenced: false,
+      silencedTurns: 0,
+      eliminated: false,
+    });
+  }
+
+  // If fewer than 5 players, still fill with AI using remaining roles
+  // (already handled above)
+
+  // Build deck
+  G.deck = buildDeck();
+  G.discard = [];
+  G.currentTurn = 0;
+  G.currentColor = null;
+  G.currentNumber = null;
+  G.gameOver = false;
+  G.waitingForColor = false;
+  G.pendingCardPlay = null;
+
+  // Deal 5 cards each
+  for(let p of G.players) {
+    for(let k=0;k<5;k++) dealCard(p);
+  }
+
+  // Flip first card (non-curse)
+  let startCard;
+  do { startCard = G.deck.pop(); } while(startCard.isCurse);
+  G.discard.push(startCard);
+  G.currentColor = startCard.color;
+  G.currentNumber = startCard.number;
+
+  // Show role reveal for human
+  showRoleReveal();
+}
+
+function dealCard(player) {
+  if(G.deck.length === 0) reshuffleDeck();
+  if(G.deck.length > 0) player.hand.push(G.deck.pop());
+}
+
+function reshuffleDeck() {
+  if(G.discard.length <= 1) return;
+  const top = G.discard.pop();
+  G.deck = shuffle(G.discard);
+  G.discard = [top];
+  showToast('📜 The deck has been reshuffled!');
+}
+
+// ============================================================
+// ROLE REVEAL
+// ============================================================
+function showRoleReveal() {
+  const human = G.players[0];
+  const role = human.role;
+  const isGood = role.team === 'good';
+
+  let extraInfo = '';
+  if(role.id === 'mage') {
+    const evilNames = G.players.filter(p=>p.role.team==='evil').map(p=>`${p.role.emoji} ${p.name}`).join(', ');
+    extraInfo = `<div class="role-ability-box" style="margin-top:8px;border-color:rgba(240,96,96,0.3);">
+      <strong>🔮 Your Secret Vision:</strong><br>Evil players are: <span style="color:#f06060">${evilNames}</span><br>
+      <em style="font-size:11px;opacity:.7">You cannot tell others this directly. Guide them through your actions.</em>
+    </div>`;
+  }
+
+  const html = `
+    <div class="role-reveal-card">
+      <div class="role-reveal-header ${isGood?'good-team':'evil-team'}">
+        <div class="role-reveal-emoji">${role.emoji}</div>
+        <div class="role-reveal-name">${role.name}</div>
+        <div class="role-reveal-team" style="color:${isGood?'#6ab0f5':'#f06060'}">${isGood?'⚔️ Loyal Servant of Rina':'☠️ Shadow Court — Evil'}</div>
+      </div>
+      <div class="role-reveal-body">
+        <p>${role.desc}</p>
+        <div class="role-ability-box">
+          <strong>Your Ability:</strong> ${role.ability}<br>
+          <span style="opacity:.8">${role.abilityDesc}</span>
+        </div>
+        ${extraInfo}
+      </div>
+    </div>`;
+
+  document.getElementById('role-reveal-content').innerHTML = html;
+  showScreen('screen-role');
+}
+
+function proceedAfterRole() {
+  renderGame();
+  showScreen('screen-game');
+  setLog(`The game begins! It is ${G.players[G.currentTurn].name}'s turn.`);
+  if(G.currentTurn !== 0) setTimeout(aiTurn, 1200);
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function renderGame() {
+  renderOpponents();
+  renderDiscardPile();
+  renderPlayerHand();
+  renderAbilities();
+  document.getElementById('turn-name').textContent = G.players[G.currentTurn].name;
+  document.getElementById('deck-count').textContent = G.deck.length;
+  document.getElementById('player-name-tag').textContent = `${G.players[0].role.emoji} ${G.players[0].name}`;
+
+  // Highlight if player's turn
+  const pz = document.getElementById('player-zone');
+  pz.classList.toggle('my-turn', G.currentTurn === 0);
+}
+
+function renderOpponents() {
+  const row = document.getElementById('opponents-row');
+  row.innerHTML = '';
+  const opponents = G.players.filter(p=>p.id!==0);
+  if(opponents.length===0){ row.innerHTML='<div style="font-size:12px;color:rgba(244,232,193,0.3);padding:10px;">Solo mode — AI opponents below</div>'; return; }
+  for(const p of opponents){
+    const isActive = G.currentTurn === p.id;
+    const el = document.createElement('div');
+    el.className = 'opponent-zone' + (isActive?' active-turn':'') + (p.eliminated?' eliminated':'');
+    el.innerHTML = `
+      ${p.abilityUsed?'<div class="ability-used-badge">Ability Used</div>':''}
+      <div class="opp-name">${p.role.emoji} ${p.name}</div>
+      <div class="opp-cards">${p.hand.map(()=>'<div class="opp-card-back">🂠</div>').join('')}</div>
+      <div class="opp-tag">${p.hand.length} cards${p.shielded?' 🛡️':''}${p.silenced?' 🤫':''}</div>
+    `;
+    row.appendChild(el);
+  }
+}
+
+function renderDiscardPile() {
+  const topCard = G.discard[G.discard.length-1];
+  const pile = document.getElementById('discard-pile');
+  const numEl = document.getElementById('top-card-num');
+  const clrEl = document.getElementById('top-card-color');
+  pile.className = 'discard-pile';
+  if(!topCard){ numEl.textContent='—'; clrEl.textContent='—'; return; }
+  const displayColor = G.currentColor || topCard.color;
+  pile.classList.add(`card-${displayColor}`);
+  numEl.textContent = topCard.isCurse ? '☠️' : topCard.number;
+  clrEl.textContent = displayColor.toUpperCase();
+}
+
+function renderPlayerHand() {
+  const container = document.getElementById('hand-cards');
+  container.innerHTML = '';
+  const player = G.players[0];
+  if(player.eliminated){ container.innerHTML='<div style="color:#f06060;font-size:14px;">You have been eliminated.</div>'; return; }
+
+  const topColor = G.currentColor;
+  const topNumber = G.currentNumber;
+
+  player.hand.forEach((card, idx)=>{
+    const canPlay = G.currentTurn===0 && canPlayCard(card, topColor, topNumber);
+    const div = document.createElement('div');
+    div.className = `card card-${card.isCurse?'curse-bg':card.color}${canPlay?'':' unplayable'}`;
+    div.innerHTML = `
+      <div class="card-num">${card.isCurse?'☠':card.number}</div>
+      <div class="card-clr">${card.isCurse?'CURSE':card.color}</div>
+    `;
+    if(canPlay) div.onclick = () => playerPlayCard(idx);
+    container.appendChild(div);
+  });
+}
+
+function canPlayCard(card, topColor, topNumber) {
+  if(card.isCurse) return false; // curse cards cannot be played, only drawn
+  return card.color === topColor || card.number === topNumber;
+}
+
+function renderAbilities() {
+  const panel = document.getElementById('ability-panel');
+  panel.innerHTML = '';
+  const player = G.players[0];
+  if(player.eliminated) return;
+
+  const role = player.role;
+  if(role.id==='mage') {
+    // Mage has no active ability
+    const info = document.createElement('div');
+    info.style.cssText='font-size:12px;color:rgba(244,232,193,0.4);padding:8px;font-style:italic;';
+    info.textContent='🔮 You are the Mage. Your power is knowledge — act wisely.';
+    panel.appendChild(info);
+    return;
+  }
+
+  if(role.id==='jose') {
+    addAbilityBtn(panel, '⚔️', 'STRIKE', 'Eliminate one player (risky!)', player.abilityUsed, ()=>activateJose(), false);
+  }
+  if(role.id==='carl') {
+    addAbilityBtn(panel, '🛡️', 'SHIELD', 'Protect a player from next ability', player.abilityUsed, ()=>activateCarl(), false);
+  }
+  if(role.id==='louise') {
+    addAbilityBtn(panel, '💀', 'CORRUPT DRAW', 'Force a player to draw +2 cards', player.abilityUsed, ()=>activateLouise('corrupt'), true);
+    addAbilityBtn(panel, '👁️', 'FALSE VISION', 'Peek at a player\'s alignment (Good/Evil)', player.abilityUsed, ()=>activateLouise('vision'), true);
+    addAbilityBtn(panel, '🤫', 'SILENCE CURSE', 'Prevent a player from using abilities for 1 turn', player.abilityUsed, ()=>activateLouise('silence'), true);
+  }
+  if(role.id==='nica') {
+    addAbilityBtn(panel, '🕵️', 'HUNT MAGE', 'Guess which player is the Mage — Win if correct!', player.abilityUsed, ()=>activateNica(), true);
+  }
+}
+
+function addAbilityBtn(panel, emoji, name, desc, used, handler, isEvil) {
+  const btn = document.createElement('div');
+  btn.className = `ability-btn${isEvil?' evil-ab':''}${used?' used':''}`;
+  btn.innerHTML = `<div class="ab-emoji">${emoji}</div><div class="ab-name">${name}</div><div class="ab-desc">${desc}</div>`;
+  if(!used) btn.onclick = handler;
+  panel.appendChild(btn);
+}
+
+// ============================================================
+// CARD PLAY
+// ============================================================
+function playerPlayCard(idx) {
+  if(G.currentTurn!==0) return;
+  const player = G.players[0];
+  if(player.eliminated||player.silenced) { showToast('🤫 You are silenced and cannot act this turn!'); return; }
+  const card = player.hand[idx];
+  if(!canPlayCard(card, G.currentColor, G.currentNumber)){ showToast('❌ That card cannot be played right now.'); return; }
+
+  player.hand.splice(idx,1);
+  G.discard.push(card);
+  G.currentColor = card.color;
+  G.currentNumber = card.number;
+
+  setLog(`${player.name} played a ${card.color.toUpperCase()} ${card.number}.`);
+
+  // Check win
+  if(player.hand.length===0){ endGame('good','You emptied your hand! Victory!'); return; }
+
+  nextTurn();
+}
+
+function playerDrawCard() {
+  if(G.currentTurn!==0) { showToast('It\'s not your turn!'); return; }
+  const player = G.players[0];
+  if(player.eliminated) return;
+  dealCard(player);
+  const drew = player.hand[player.hand.length-1];
+  let msg = `You drew a ${drew.color} ${drew.number} card.`;
+  if(drew.isCurse){
+    msg = `☠️ You drew a CURSE card! Skip your next turn.`;
+    player.silenced = true; player.silencedTurns = 1;
+  }
+  setLog(msg);
+  renderGame();
+  nextTurn();
+}
+
+// ============================================================
+// TURN MANAGEMENT
+// ============================================================
+function nextTurn() {
+  if(G.gameOver) return;
+  // Find next living player
+  let next = (G.currentTurn+1) % G.players.length;
+  let attempts = 0;
+  while(G.players[next].eliminated && attempts < G.players.length){
+    next = (next+1)%G.players.length;
+    attempts++;
+  }
+  // Check if only one faction remains
+  checkFactionWin();
+  if(G.gameOver) return;
+
+  G.currentTurn = next;
+
+  // Handle silenced
+  const cp = G.players[G.currentTurn];
+  if(cp.silenced){
+    cp.silencedTurns--;
+    if(cp.silencedTurns<=0) cp.silenced=false;
+    setLog(`${cp.name} is silenced — their turn is skipped!`);
+    renderGame();
+    setTimeout(()=>nextTurn(), 1000);
+    return;
+  }
+
+  renderGame();
+  document.getElementById('turn-name').textContent = cp.name;
+
+  if(G.currentTurn !== 0) setTimeout(aiTurn, 1200);
+}
+
+function checkFactionWin() {
+  const living = G.players.filter(p=>!p.eliminated);
+  const goodAlive = living.filter(p=>p.role.team==='good');
+  const evilAlive = living.filter(p=>p.role.team==='evil');
+  if(evilAlive.length===0){ endGame('good','All evil players have been eliminated. The realm is saved!'); return; }
+  if(goodAlive.length===0){ endGame('evil','The Shadow Court has prevailed. Darkness covers the realm.'); return; }
+}
+
+// ============================================================
+// AI TURN
+// ============================================================
+function aiTurn() {
+  if(G.gameOver) return;
+  const player = G.players[G.currentTurn];
+  if(!player || player.eliminated || G.currentTurn===0) return;
+
+  // AI ability usage (random chance)
+  if(!player.abilityUsed && Math.random()<0.3) {
+    const used = tryAiAbility(player);
+    if(used){ renderGame(); setTimeout(()=>aiContinueTurn(player), 1000); return; }
+  }
+  aiContinueTurn(player);
+}
+
+function aiContinueTurn(player) {
+  if(G.gameOver) return;
+  // Find playable card
+  const playable = player.hand.filter(c=>canPlayCard(c,G.currentColor,G.currentNumber));
+  if(playable.length>0){
+    const card = playable[Math.floor(Math.random()*playable.length)];
+    const idx = player.hand.indexOf(card);
+    player.hand.splice(idx,1);
+    G.discard.push(card);
+    G.currentColor = card.color;
+    G.currentNumber = card.number;
+    setLog(`${player.name} played a ${card.color.toUpperCase()} ${card.number}.`);
+    if(player.hand.length===0){
+      endGame(player.role.team==='evil'?'evil':'good', `${player.name} emptied their hand!`);
+      return;
+    }
+  } else {
+    dealCard(player);
+    const drew = player.hand[player.hand.length-1];
+    if(drew.isCurse){ player.silenced=true; player.silencedTurns=1; }
+    setLog(`${player.name} draws a card.`);
+  }
+  renderGame();
+  setTimeout(nextTurn, 600);
+}
+
+function tryAiAbility(player) {
+  const role = player.role;
+  const others = G.players.filter(p=>p.id!==player.id&&!p.eliminated);
+  if(others.length===0) return false;
+
+  if(role.id==='jose'){
+    // Try to strike an evil player if AI is good
+    const evilTarget = others.find(p=>p.role.team==='evil');
+    if(evilTarget){
+      player.abilityUsed=true;
+      evilTarget.eliminated=true;
+      setLog(`⚔️ ${player.name} strikes! ${evilTarget.name} is eliminated!`);
+      checkFactionWin();
+      return true;
+    }
+  }
+  if(role.id==='carl'){
+    const goodTarget = others.find(p=>p.role.team==='good');
+    if(goodTarget){
+      player.abilityUsed=true;
+      goodTarget.shielded=true;
+      setLog(`🛡️ ${player.name} shields ${goodTarget.name}!`);
+      return true;
+    }
+  }
+  if(role.id==='louise'){
+    // Pick a random good player to corrupt draw
+    const goodTarget = others.find(p=>p.role.team==='good');
+    if(goodTarget && !player.abilityUsed){
+      player.abilityUsed=true;
+      dealCard(goodTarget); dealCard(goodTarget);
+      setLog(`💀 Louise uses Corrupt Draw on ${goodTarget.name}! +2 cards!`);
+      return true;
+    }
+  }
+  if(role.id==='nica'){
+    // Nica hunts Mage (50% chance she gets it wrong since she doesn't know for sure)
+    const magePlayer = others.find(p=>p.role.id==='mage');
+    if(magePlayer && Math.random()<0.4){
+      player.abilityUsed=true;
+      setLog(`🕷️ Nica hunts the Mage... and finds ${magePlayer.name}! EVIL WINS!`);
+      endGame('evil','Nica has exposed the Mage! The Shadow Court triumphs!');
+      return true;
+    } else if(Math.random()<0.3){
+      // Wrong guess
+      player.abilityUsed=true;
+      const wrongTarget = others[Math.floor(Math.random()*others.length)];
+      setLog(`🕷️ Nica hunts the Mage... but ${wrongTarget.name} is not the Mage. The hunt fails.`);
+      return true;
+    }
+  }
+  return false;
+}
+
+// ============================================================
+// PLAYER ABILITIES
+// ============================================================
+function activateJose() {
+  if(G.currentTurn!==0) return;
+  const player = G.players[0];
+  if(player.abilityUsed){ showToast('You have already used your ability!'); return; }
+  const targets = G.players.filter(p=>p.id!==0&&!p.eliminated);
+  openTargetOverlay('⚔️ STRIKE — Choose Your Target', 'If evil → eliminated. If good → you lose 2 cards!', targets, (target)=>{
+    player.abilityUsed=true;
+    if(target.role.team==='evil'){
+      target.eliminated=true;
+      setLogBig(`⚔️ ${player.name} strikes ${target.name}! They were EVIL — eliminated!`);
+      checkFactionWin();
+    } else {
+      dealCard(player); dealCard(player);
+      setLogBig(`⚔️ ${player.name} struck an innocent! ${target.name} was GOOD. Jose loses 2 cards as penance.`);
+    }
+    renderGame();
+  });
+}
+
+function activateCarl() {
+  if(G.currentTurn!==0) return;
+  const player = G.players[0];
+  if(player.abilityUsed){ showToast('You have already used your ability!'); return; }
+  const targets = G.players.filter(p=>!p.eliminated);
+  openTargetOverlay('🛡️ SHIELD — Choose Who to Protect', 'This player will be immune to the next ability used against them.', targets, (target)=>{
+    player.abilityUsed=true;
+    target.shielded=true;
+    setLogBig(`🛡️ ${target.name} is now shielded!`);
+    renderGame();
+  });
+}
+
+let louiseAbilityType = null;
+function activateLouise(type) {
+  if(G.currentTurn!==0) return;
+  const player = G.players[0];
+  if(player.abilityUsed){ showToast('You have already used your ability this game!'); return; }
+  louiseAbilityType = type;
+  const targets = G.players.filter(p=>p.id!==0&&!p.eliminated);
+  let title, sub;
+  if(type==='corrupt') { title='💀 CORRUPT DRAW'; sub='Target must draw +2 cards.'; }
+  if(type==='vision')  { title='👁️ FALSE VISION'; sub='See if a player is GOOD or EVIL.'; }
+  if(type==='silence') { title='🤫 SILENCE CURSE'; sub='Target cannot use abilities for 1 turn.'; }
+  openTargetOverlay(title, sub, targets, (target)=>{
+    player.abilityUsed=true;
+    if(type==='corrupt'){
+      if(target.shielded){ target.shielded=false; setLogBig(`💀 Louise's Corrupt Draw was BLOCKED by ${target.name}'s shield!`); }
+      else { dealCard(target); dealCard(target); setLogBig(`💀 Louise forces ${target.name} to draw +2 cards!`); }
+    }
+    if(type==='vision'){
+      const alignment = target.role.team==='good'?'GOOD ⚔️':'EVIL ☠️';
+      showToast(`👁️ Vision reveals: ${target.name} is ${alignment}`);
+      setLog(`Louise used False Vision on ${target.name}.`);
+    }
+    if(type==='silence'){
+      if(target.shielded){ target.shielded=false; setLogBig(`🤫 Silence Curse was BLOCKED by ${target.name}'s shield!`); }
+      else { target.silenced=true; target.silencedTurns=1; setLogBig(`🤫 ${target.name} is silenced for 1 turn!`); }
+    }
+    renderGame();
+  });
+}
+
+function activateNica() {
+  if(G.currentTurn!==0) return;
+  const player = G.players[0];
+  if(player.abilityUsed){ showToast('You have already used your ability!'); return; }
+  const targets = G.players.filter(p=>p.id!==0&&!p.eliminated);
+  openTargetOverlay('🕷️ HUNT — Guess the Mage', 'If your target is the Mage — EVIL WINS INSTANTLY!', targets, (target)=>{
+    player.abilityUsed=true;
+    if(target.role.id==='mage'){
+      setLogBig(`🕷️ Nica exposes ${target.name} as THE MAGE! EVIL WINS!`);
+      setTimeout(()=>endGame('evil', `Nica correctly identified ${target.name} as the Mage! The Shadow Court wins!`), 800);
+    } else {
+      setLogBig(`🕷️ Nica guesses ${target.name} is the Mage... but they are NOT. The hunt fails.`);
+      renderGame();
+    }
+  });
+}
+
+// ============================================================
+// TARGET OVERLAY
+// ============================================================
+let targetCallback = null;
+function openTargetOverlay(title, sub, targets, callback) {
+  targetCallback = callback;
+  document.getElementById('target-title').textContent = title;
+  document.getElementById('target-subtitle').textContent = sub;
+  const list = document.getElementById('target-list');
+  list.innerHTML = '';
+  for(const t of targets){
+    const el = document.createElement('div');
+    el.className = 'target-card';
+    el.innerHTML = `<div class="tc-emoji">${t.role.emoji}</div><div class="tc-name">${t.name}</div>`;
+    el.onclick = ()=>{ closeTarget(); callback(t); };
+    list.appendChild(el);
+  }
+  document.getElementById('target-overlay').classList.add('show');
+}
+function cancelTarget(){ closeTarget(); }
+function closeTarget(){
+  document.getElementById('target-overlay').classList.remove('show');
+  targetCallback = null;
+}
+
+// ============================================================
+// COLOR CHOOSER (unused — kept simple)
+// ============================================================
+let colorCallback = null;
+function openColorChooser(cb){ colorCallback=cb; document.getElementById('color-chooser').classList.add('show'); }
+function chooseColor(c){ document.getElementById('color-chooser').classList.remove('show'); if(colorCallback) colorCallback(c); }
+
+// ============================================================
+// GAME OVER
+// ============================================================
+function endGame(winnerTeam, message) {
+  if(G.gameOver) return;
+  G.gameOver = true;
+  const isGoodWin = winnerTeam==='good';
+  document.getElementById('go-crest').textContent = isGoodWin ? '⚔️' : '☠️';
+  document.getElementById('go-title').textContent = isGoodWin ? '⚜️ Victory for the Realm!' : '☠️ The Shadow Court Prevails';
+  document.getElementById('go-title').style.color = isGoodWin ? 'var(--gold-light)' : '#f06060';
+  document.getElementById('go-sub').textContent = message;
+
+  // Reveal all roles
+  const reveals = document.getElementById('go-reveals');
+  reveals.innerHTML = '';
+  for(const p of G.players){
+    const badge = document.createElement('div');
+    badge.className='reveal-badge';
+    badge.innerHTML=`<div class="rb-emoji">${p.role.emoji}</div><div class="rb-name">${p.name}</div><div class="rb-role" style="color:${p.role.team==='good'?'#6ab0f5':'#f06060'}">${p.role.name}</div>`;
+    reveals.appendChild(badge);
+  }
+  setTimeout(()=>showScreen('screen-gameover'), 1500);
+}
+
+// ============================================================
+// ACTION LOG
+// ============================================================
+function setLog(msg){
+  const el = document.getElementById('action-log');
+  el.className='action-log';
+  el.textContent=msg;
+}
+function setLogBig(msg){
+  const el = document.getElementById('action-log');
+  el.className='action-log big-announce';
+  el.textContent=msg;
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+let toastTimer=null;
+function showToast(msg){
+  const existing=document.querySelector('.toast');
+  if(existing) existing.remove();
+  const t=document.createElement('div');
+  t.className='toast'; t.textContent=msg;
+  document.body.appendChild(t);
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.remove(), 2800);
+}
+</script>
 </body>
-</html>
-
-
+</html> 
